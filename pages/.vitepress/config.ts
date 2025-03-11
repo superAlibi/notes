@@ -4,7 +4,6 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "云逸尘小记",
   description: "一个前端牛马的技术碎碎念",
-  outDir: '../dist',
   base: '/notes/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
