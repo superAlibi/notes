@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "云逸尘小记",
+  title: "云逸尘杂记",
   description: "一个前端牛马的技术碎碎念",
 
   themeConfig: {

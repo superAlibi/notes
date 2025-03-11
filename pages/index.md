@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "云逸尘小记"
+  name: "云逸尘杂记"
   text: 保持先进生产力
   tagline: 记录平时遇到的零碎问题以及最新的前端技术
   actions:
