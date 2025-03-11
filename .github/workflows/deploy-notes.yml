@@ -1,0 +1,30 @@
+name: notes-pages
+on: 
+  push: 
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: check-version
+        run: pnpm --version
+      - name: install dep
+        run: pnpm i
+      - name: build-static
+        run: pnpm run docs:build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: pages/.vitepress/dist
+
+      
+    
+    
