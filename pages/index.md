@@ -8,18 +8,17 @@ hero:
   tagline: 记录平时遇到的零碎问题以及最新的前端技术
   actions:
     - theme: brand
-      text: Markdown Examples
+      text: 留言
       link: /markdown-examples
     - theme: alt
-      text: API Examples
+      text: 最近动态
       link: /api-examples
 
 features:
-  - title: Feature A
+  - title: TypeScript
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
+  - title: Vue
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
+  - title: TailwindCSS
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
-
