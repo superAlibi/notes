@@ -7,7 +7,8 @@ export default defineConfig({
   description: "一个前端牛马的技术碎碎念",
   vite: {
     server: {
-      host: true
+      host: true,
+      allowedHosts: ['wj14x.lucardo.xyz']
     }
   },
   head: [
@@ -18,8 +19,8 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '练习案例', link: '/markdown-examples' },
-      { text: '关于我', link: '/aboutme' },
+      { text: '练习案例', link: '/practice-case' },
+      { text: '博客', link: '/blogs' },
     ],
 
     socialLinks: [
@@ -29,16 +30,21 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        text: '练习记录',
+        text: '练习案例',
+        link: '/practice-case',
         items: [
-          { text: 'makdown的例子', link: '/markdown-examples' },
-          { text: 'api的例子', link: '/api-examples' },
-          { text: '在vitepress中使用vue', link: '/vitepress-tag' },
+          { text: 'makdown的例子', link: '/practice-case/markdown-examples' },
+          { text: 'api的例子', link: '/practice-case/vitepress-runtime-api' },
+          { text: '在vitepress中使用vue', link: '/practice-case/vitepress-use-vue' },
         ]
       },
       {
-        text: '嘻嘻嘻',
-        link: '/'
+        text: '博客',
+        link: '/blogs',
+        items: [
+          { text: '安装postgresql', link: '/blogs/install-pg' },
+          { text: '安装deno', link: '/blogs/install-deno' },
+        ]
       },
     ],
     outline: {
