@@ -4,7 +4,7 @@ outline:
   level: 2
 ---
 
-# 安装deno
+# 使用cargo安装deno
 
 因为rust提供了cargo这样的二进制安装工具.可以使用cargo 安装deno.
 

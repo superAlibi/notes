@@ -43,7 +43,7 @@ export default defineConfig({
         link: '/blogs',
         items: [
           { text: '安装postgresql', link: '/blogs/install-pg' },
-          { text: '安装deno', link: '/blogs/install-deno' },
+          { text: '使用cargo安装deno', link: '/blogs/install-deno' },
         ]
       },
     ],
