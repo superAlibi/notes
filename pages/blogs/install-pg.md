@@ -180,7 +180,7 @@ host    replication     all             ::1/128                 ident
 以上表格中各列的详细描述,我这里暂时不做介绍,如果需要请自行[查看](https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
 
 这里我仅介绍如何允许一般情况下,允许远程访问方式为数据库用户账号和数据库用户账号密码登录,则按照如下配置调整
-```text
+```text{7,10}
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # "local" is for Unix domain socket connections only
@@ -202,7 +202,7 @@ host    replication     all             ::1/128                 ident
 
 一些配置参数通过命令行传递给守护进程选项。此行为可能会覆盖 `postgresql.conf` 中的设置。例如，如果要将服务器的端口号更改为 5433，请在 /etc/systemd/system/postgresql.service 文件中修改下内容(部分)
 
-```text
+```text{3}
 .include /lib/systemd/system/postgresql.service
 [Service]
 Environment=PGPORT=5433
@@ -262,3 +262,7 @@ setsebool -P httpd_can_network_connect_db on
 ```
 
 ## 六. 优化*
+
+postgres 的默认配置严重调优不足。它可以处理简单的应用程序，而无需一致的数据库访问，但如果您需要更高的性能，则应重新配置您的实例。所有的魔法都在 `/var/lib/pgsql/data/postgresql.conf` 中发生。此外，日志记录机制的配置不是很直观。
+
+有些小建议在 [fedora doc](https://docs.fedoraproject.org/en-US/quick-docs/postgresql/#optimization) 列出,这里不再做搬运
