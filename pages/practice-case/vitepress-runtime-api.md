@@ -1,8 +1,9 @@
 ---
 outline: deep
+title: vitepress运行时
 ---
 
-# Runtime API Examples
+# 运行时api案例
 
 This page demonstrates usage of some of the runtime APIs provided by VitePress.
 
