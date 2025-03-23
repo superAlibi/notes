@@ -224,7 +224,7 @@ $ sudo firewall-cmd --add-port=5432/tcp --permanent
 $ sudo firewall-cmd --reload
 ```
 
-处理命令行的方式,cockpit服务提供了图形化界面,可以方便的管理防火墙,你只需要在指定的安全域中选择开启`postgresql`服务即可,防火墙会自动重载并永久应用
+除命令行的方式, [cockpit](https://cockpit-project.org/) 服务提供了图形化界面,可以方便的管理防火墙,你只需要在指定的安全域中选择开启`postgresql`服务即可,防火墙会自动重载并永久应用
 
 
 tips:
