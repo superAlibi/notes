@@ -12,9 +12,16 @@
     "docs:preview": "vitepress preview pages"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.1",
+    "@types/three": "^0.175.0",
+    "@webgpu/types": "^0.1.60",
+    "tailwindcss": "^4.1.1",
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
     "vitepress": "^1.6.3"
   },
-  "packageManager": "pnpm@10.6.2"
+  "packageManager": "pnpm@10.7.1",
+  "dependencies": {
+    "three": "^0.175.0"
+  }
 }
