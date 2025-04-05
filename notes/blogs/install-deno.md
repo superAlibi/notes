@@ -144,7 +144,7 @@ failed to run custom build command for `libsqlite3-sys v0.30.1`
 
 ***原因***
 
-cargo在编译时依赖了sqlite3的链接库,需要安装libsqlite3-dev,具体原因不明,通过了解到
+cargo在编译时依赖了sqlite3的链接库,需要安装libsqlite3-dev,具体原因不明,通过[stack overflow](https://stackoverflow.com/questions/67297760/rust-compilation-error-failed-to-run-custom-build-command-for-freetype-sys-v0)了解到
 
 ***解决方案***
 

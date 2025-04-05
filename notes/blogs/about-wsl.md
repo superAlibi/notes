@@ -12,6 +12,14 @@ wsl成为我开发过程中不可或缺的一部分.同样,linux也是
 ## wsl2简介
 ## wsl2网络
 
+如果你使用了clash-verge,即使你关闭了,那么wsl2的网络也会受到影响,需要重新配置.
+
+至于我遇到了哪些坑:
+1. `/etc/environment.d/default-env.conf`
+2. `/etc/profile.d/defaut.env.sh`
+3. `/etc/systemd/system.conf.d/default-env.conf`
+
+
 [官方文档](https://learn.microsoft.com/zh-cn/windows/wsl/networking#mirrored-mode-networking)
 
 

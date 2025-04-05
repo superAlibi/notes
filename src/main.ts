@@ -1,24 +1,52 @@
 import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+import { PerspectiveCamera, Scene, MeshBasicMaterial, BoxGeometry, Mesh, WebGLRenderer } from 'three'
+const width = window.innerWidth, height = window.innerHeight;
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+/**
+* 基础组件代码初始化
+*/
+const scene = new Scene();
+const camera = new PerspectiveCamera(45, width / height, 0.1, 1000);
+
+
+
+/**
+* 基本设置部分
+*/
+scene.add(camera)
+camera.position.set(66, 66, 66)
+camera.lookAt(0, 0, 0)
+
+
+const renderer = new WebGLRenderer()
+renderer.setSize(width, height)
+function animate() {
+  renderer.render(scene, camera)
+  requestAnimationFrame(animate)
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  animate()
+  document.body.querySelector('#app')?.appendChild(renderer.domElement)
+})
+
+
+
+
+
+
+
+/**
+ * 场景内容
+*/
+const baseMaterial = new MeshBasicMaterial({
+  color: 0x00ff00
+})
+const baseGeometry = new BoxGeometry(20, 20, 20)
+const baseMesh = new Mesh(baseGeometry, baseMaterial)
+scene.add(baseMesh)
+
+
+
+
