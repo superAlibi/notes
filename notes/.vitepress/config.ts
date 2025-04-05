@@ -16,6 +16,9 @@ export default defineConfig({
   ],
   themeConfig: {
     logo: '/vite.svg',
+    search: {
+      provider: 'local'
+    },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
