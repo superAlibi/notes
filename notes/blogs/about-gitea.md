@@ -522,3 +522,8 @@ sudo systemctl status act_runner.service
 这点让我十分困惑,当时初看的时候以为gitea-runner负责运行所有的job,否则容易看得不明所以,实际上gitea actions runner在运行jobs时,会根据runs-on的label来选择,这个label没有那么简单,具体参考[官方描述](https://docs.gitea.com/zh-cn/usage/actions/act-runner#%E6%A0%87%E7%AD%BE)
 
 其次,github的actions仓库大部分都是使用typescript写的,因此,runner的label第二部分不论是使用host还是docker都至少支持nodejs才对.而nodejs生态可选的东西就可多了
+
+
+为什么什么也不需要做,就能在gitea actions runner中运行docker的镜像构建命令 :) :
+podman作为新一代容器,在尊重传统docker容器上也下了功夫,至于为什么在只有podman容器的wsl2虚拟机上,也能正常运行docker的镜像构建命令,是因为docker的actions构建镜像的方式是使用docker的socket套接字实现的.
+因为podman完全通过模拟docker的套接字实现运行docker的构建镜像actions.同样docker的构建镜像actions是使用nodejs和套接字通信的.关于unix soket可以自行搜索相关文章.
