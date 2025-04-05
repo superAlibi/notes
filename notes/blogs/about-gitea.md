@@ -41,7 +41,8 @@
 
 ## 主要内容
 
-本文主要内容是如何使用podman部署一个rootless的gitea systemd服务,并且注册一个act_runner到gitea服务,并在使用systemd的fedora server 41的 wsl2 虚拟机上注册一个act_runner服务,使虚拟机开启自动act runner,并在gitea成为可用的action runner.
+本文主要内容是如何使用podman部署一个rootless的gitea systemd服务,并且注册一个act_runner到gitea服务.
+并在使用 wsl2 虚拟机上运行一个act_runner systemd服务,使虚拟机开启自动act runner,并在gitea成为可用的action runner.
 
 至于本文为什么要使用rootless,是因为我不想遇到令人讨厌的selinux问题 :)
 
