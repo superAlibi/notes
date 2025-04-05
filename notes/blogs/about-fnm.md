@@ -4,4 +4,7 @@ fnm 是的缩写,是 [fast node manager](https://github.com/Schniz/fnm) 的缩�
 
 我选择它作为管理 node.js 版本的工具,是因为它比其他工具更轻量级,且是用 `rust` 编写的.
 
-是我必备的工具之一.
+是我前端开发必备的工具之一.
+
+在任何机器上开发时,均会使用它来管理 node.js 版本.
+
