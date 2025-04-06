@@ -43,26 +43,26 @@
 
 ### 你需要具备的知识储备
 
-要完全理解本文所描述的内容,你需要具备以下知识储备:
+要完全理解本文所描述的内容，你需要具备以下知识储备：
 
-  - Linux操作系统经验
-  - 知道并理解docker/podman rootless概念
-  - 知道并理解docker volume/podman volume概念和作用
-  - 明白act runner是什么
-  - 了解systemd
-  - 了解gitea/github
-  - 熟悉github actions/gitea actions
-  - 理解unix socket
-  - 熟悉wsl
+  - Linux 操作系统经验
+  - 知道并理解 Docker/Podman rootless 概念
+  - 知道并理解 Docker Volume/Podman Volume 概念和作用
+  - 明白 Act Runner 是什么
+  - 了解 Systemd
+  - 了解 Gitea/GitHub
+  - 熟悉 GitHub Actions/Gitea Actions
+  - 理解 Unix Socket
+  - 熟悉 WSL
 
 
 
 ## 主要内容
 
-本文主要内容是如何使用podman部署一个rootless的gitea systemd服务,并且注册一个act_runner到gitea服务.
-并在使用 wsl2 虚拟机上运行一个act_runner systemd服务,使虚拟机开启自动act runner,并在gitea成为可用的action runner.
+本文主要内容是如何使用 Podman 部署一个 rootless 的 Gitea systemd 服务，并且注册一个 Act Runner 到 Gitea 服务。
+并在使用 WSL2 虚拟机上运行一个 Actions Runner systemd 服务，使虚拟机开启自动 Act Runner，使其在 Gitea 可用。
 
-至于本文为什么要使用rootless,是因为我不想遇到令人讨厌的selinux问题 :)
+至于本文为什么要使用 rootless，是因为我不想遇到令人讨厌的 SELinux 问题 :)
 
 
 
@@ -70,21 +70,21 @@
 
 ## 环境说明
 
-信息技术随着时间的推移,会导致软件运行/部署的最佳实践发生变化.因此说明一下文章的环境,以供参考.
+信息技术随着时间的推移，会导致软件运行/部署的最佳实践发生变化。因此说明一下文章的环境，以供参考。
 
 ### 硬件环境
 
 
-1. 康奈信/intel n100/4网口小主机2024年款(用于运行gitea rootless容器)
-2. 家庭宽带/ipv6网络(常用端口已被运营商防火墙拦截)
-3. 机械革命无界14x 2024年笔记本(用于开发,并在wsl2中运行act runner 服务)
+1. 康奈信/Intel N100/4 网口小主机 2024 年款（用于运行 Gitea rootless 容器）
+2. 家庭宽带/IPv6 网络（常用端口已被运营商防火墙拦截）
+3. 机械革命无界 14x 2024 年笔记本（用于开发，并在 WSL2 中运行 Act Runner 服务）
 
 
 ### 软件版本 & 第三方服务
 
-1. cloudflare dns服务
-2. 阿里云dns服务
-3. windows wsl2(用于运行actions runner)
+1. Cloudflare DNS 服务
+2. 阿里云 DNS 服务
+3. Windows WSL2（用于运行 Actions Runner）
 
    ```powershell
    wsl --version
