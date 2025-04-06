@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   lang: 'zh-CN',
@@ -9,7 +8,7 @@ export default defineConfig({
     server: {
       host: true,
       allowedHosts: ['wj14x.lucardo.xyz']
-    }
+    },
   },
   head: [
     ['link', { rel: 'icon', href: '/vite.svg' }],
