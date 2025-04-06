@@ -1,13 +1,10 @@
-
-
 # 关于 Gitea 二三事
 
 为什么想要自己搭建一个私人仓库，而不是使用 GitHub、GitLab、码云这些已有的公认仓库呢？
 
 主要原因还是在于那段时间出现了一些政治因素，看到有些仓库被封锁，无法访问。虽然我不是什么政治犯，但也心存芥蒂。
 
-最开始我是想用 GitLab 构建一个私人仓库的。为什么将 GitLab 作为第一选择？
-因为我待得最长那家公司：`成都中联信通科技股份有限公司`，就是使用的 GitLab + Jenkins 做的自动化构建部署。
+最开始我是想用 GitLab 构建一个私人仓库的。为什么将 GitLab 作为第一选择？大概是因为受到了我工作过的公司：`成都中联信通科技股份有限公司` 的启影响: 他们使用 GitLab + Jenkins 做的自动化构建部署。
 
 受到其带来的便利性和启发后，也部署了 GitLab 服务，并尝试使用 GitLab 内置的 CI/CD。
 
@@ -28,9 +25,7 @@
 
 ## 前言
 
-在阅读本文前，有必要阅读关于本文撰写的前提概况，否则很有可能因为环境或者对某些概念不熟悉，造成理解上的困难。
-对每一个术语或者概念，我会尽可能提供外部连接，在你不理解这个概念的情况下，可以通过文中提供的连接去查看。
-有关概念非常多，DevOps 新手会遇到很多问题，花的时间也很长（我摸索了大半个月），但这些时间花出去却是必要的。
+在阅读本文前，有必要阅读关于本文撰写的前提概况，否则很有可能因为环境或者对某些概念不熟悉，造成理解上的困难。对每一个术语或者概念，我会尽可能提供外部连接，在你不理解这个概念的情况下，可以通过文中提供的连接去查看。有关概念非常多，DevOps 新手会遇到很多问题，花的时间也很长（我摸索了大半个月），但这些时间花出去却是必要的。
 
 本文假设读者喜欢并认同 systemd、WSL、podman rootless. 这是本文区别于很多文章的基石和基本动机，以及本文产生的结果。
 
@@ -41,7 +36,6 @@
 - 作为一个崇尚 DevOps 的开发者，我希望我的开发环境尽可能的自动化
 - 出于对分享的欲望，减少新朋友摸索时间
 - 出于功利的需要
-
 
 关于本文中命令行, 如果没有 `sudo` 开头, 则表明该命令行只是一个普通用户的命令行, 而不是 root 用户的命令行。
 
@@ -62,8 +56,7 @@
 
 ## 主要内容
 
-本文主要内容是如何使用 Podman 部署一个 rootless 的 Gitea systemd 服务，并且注册一个 Gitea Actions Runner 到 Gitea 服务。
-并在使用 WSL2 虚拟机上运行一个 Actions Runner systemd 服务，保证虚拟机开启自动 Gitea Actions Runner，使 Gitea Actions 自动可用。
+本文主要内容是如何使用 Podman 部署一个 rootless 的 Gitea systemd 服务，并且注册一个 Gitea Actions Runner 到 Gitea 服务。并在使用 WSL2 虚拟机上运行一个 Actions Runner systemd 服务，保证虚拟机开启自动 Gitea Actions Runner，使 Gitea Actions 自动可用。
 
 至于本文为什么要使用 rootless，是因为我不想遇到令人讨厌的 SELinux 问题 :)
 
@@ -108,7 +101,7 @@ podman version 5.4.1
 ```
 
 ***运行 gitea rootless 容器的服务器 (康奈信小主机) 系统信息***
-   
+
 ```bash
 cat /etc/os-release
 ```
@@ -180,9 +173,7 @@ VARIANT_ID=container
 
 ***设置运行 gitea 服务的 rootless 用户***
 
-此步骤假设当前操作用户具备 sudo 用户操作权限，并且运行 gitea 服务的用户账号为 `rootless`
-通过设置 `loginctl enable-linger`, 为运行 gitea 服务的 rootless 用户退出登录时不释放服务资源。
-
+此步骤假设当前操作用户具备 sudo 用户操作权限，并且运行 gitea 服务的用户账号为 `rootless` 通过设置 `loginctl enable-linger`, 为运行 gitea 服务的 rootless 用户退出登录时不释放服务资源。
 
 ```bash
 sudo loginctl enable-linger rootless
@@ -193,7 +184,6 @@ sudo loginctl enable-linger rootless
 ```bash
 sudo loginctl disable-linger rootless
 ```
-
 
 ***创建 gitea 的数据卷***
 
@@ -212,8 +202,6 @@ podman volume create gitea-data
 ```bash
 podman volume create gitea-config
 ```
-
-
 
 ### 二. 创建 gitea rootless 容器
 
@@ -333,9 +321,7 @@ podman ps
 
 </figure>
 
-`基础 URL` 表单项需要根据您的实际环境填写，假设您将 gitea 部署到 `https://example.com`，
-那么这里需要填 `https://example.com`。如果您将 gitea 服务使用代理服务，那么这里应该填写代理服务的地址。
-例如 nginx 代理服务器代理的地址是 `https://gitea.example.com:5554`， 那么`基础URL`就应该是 `https://gitea.example.com:5554`。
+`基础 URL` 表单项需要根据您的实际环境填写，假设您将 gitea 部署到 `https://example.com`，那么这里需要填 `https://example.com`。如果您将 gitea 服务使用代理服务，那么这里应该填写代理服务的地址。例如 nginx 代理服务器代理的地址是 `https://gitea.example.com:5554`， 那么`基础URL`就应该是 `https://gitea.example.com:5554`。
 
 假设您没有注意到这些选项。直接点击最底部的安装按钮，可能就无法再次进入到 web 初始化页面了。
 
@@ -347,22 +333,16 @@ podman exec -it gitea vi /etc/gitea/app.ini
 
 在编辑器中修改 `server` 下的 `ROOT_URL` 参数，参数的值需要和您实际访问 gitea 服务的 http(s) 地址一致。这样您就不会在登录页面看到警告了。
 
-
-
 #### 2. SSH 服务端口
 
-如果您需要使用 gitea 提供的 ssh 仓库克隆服务的情况下，需要特别注意 `SSH 服务端口` 表单项。
-此项表示在使用 gitea 仓库时，仓库 web ui 界面用于提示使用, 通过 ssh 克隆选项下一定会使用该配置。
-根据前文创建容器时指定的端口映射 :  `-p 3333:2222`，因此这里需要填 `3333`，因为容器暴露的端口是 `3333`，而不是 2222。否则无法使用 ssh 协议克隆仓库。
+如果您需要使用 gitea 提供的 ssh 仓库克隆服务的情况下，需要特别注意 `SSH 服务端口` 表单项。此项表示在使用 gitea 仓库时，仓库 web ui 界面用于提示使用, 通过 ssh 克隆选项下一定会使用该配置。根据前文创建容器时指定的端口映射 :  `-p 3333:2222`，因此这里需要填 `3333`，因为容器暴露的端口是 `3333`，而不是 2222。否则无法使用 ssh 协议克隆仓库。
 
 与基础 URL 配置错误一样，如果您没有注意到该项，直接点击了最底部的安装按钮，可以通过进入容器内编辑 `/etc/gitea/app.ini` 文件，修改 `[server]` 下的 `SSH_PORT` 变量。
 
-
-::: info 
+::: info
 
 ##### 配置文件在物理机上的位置
-gitea 默认配置文件 位于 物理机 `~/.local/share/containers/storage/volumes/gitea-config/_data/app.ini` 文件中, 在创建容器时, 此文件已经位于容器卷 `gitea-config` 中。
-直接编辑此配置文件需要 sudo 权限, 但我并不推荐这么修改, 更推荐通过进入容器中编辑配置文件:
+gitea 默认配置文件 位于 物理机 `~/.local/share/containers/storage/volumes/gitea-config/_data/app.ini` 文件中, 在创建容器时, 此文件已经位于容器卷 `gitea-config` 中。直接编辑此配置文件需要 sudo 权限, 但我并不推荐这么修改, 更推荐通过进入容器中编辑配置文件:
 ```bash
 podman exec -it gitea vi /etc/gitea/app.ini
 ```
@@ -370,13 +350,9 @@ podman exec -it gitea vi /etc/gitea/app.ini
 
 :::
 
-
-
 #### 3. 其他配置
 
 其他的配置均为容器内的配置。和仓库拉取推送无关的配置，可以根据个人需要进行修改。
-
-
 
 #### 4. QA
 如果您的服务器开启了 firewall，请不要忘记开启您的 gitea 服务监听的端口，以保证 gitea 服务可用
@@ -423,11 +399,10 @@ runner 通常用来运行编译，执行前端打包，执行测试，部署等�
 
 因为 runner 通常运行需要构建容器镜像的任务，又因为现在 rootless 的概念比较新颖，根据 [deepseek v3](https://www.deepseek.com/) 的问答：
 
-
 ::: details 查看对话
 **Q**: rootless 的概念提出是什么时候，在现有的资料中，人们对 rootless 的了解和认知普遍吗
 
-**A**:
+**A**：
 
 1. **起源时间**: rootless 容器技术最早由 Docker 在 2019 年正式提出并实现
 2. **认知普及度**:
@@ -455,8 +430,6 @@ gitea 官方提供了多种方式运行 runner 服务，[官方文档](https://d
 
 为此我并不排斥使用 podman 官方提供的方式: 在 Windows 上安装 一个新的 wsl2 虚拟机，毕竟我也很喜欢 wsl2。
 
-
-
 ### 三. 将 runner 注册到 Gitea 实例
 
 #### 1. 下载二进制文件
@@ -483,8 +456,6 @@ sudo act_runner generate-config > /etc/gitea/act_runner/config.yaml
 获得方法可以参考[官方文档](https://docs.gitea.com/zh-cn/usage/actions/act-runner#%E8%8E%B7%E5%8F%96%E6%B3%A8%E5%86%8C%E4%BB%A4%E7%89%8C)。
 
 #### 4. 注册runner
-
-
 
 ```bash
 sudo cd /etc/gitea/act_runner
@@ -574,7 +545,7 @@ sudo systemctl status act_runner.service
 
 通读后需要整理下才能理解，这个强调具体指是 jobs 的运行，而不是 gitea actions runner 服务本身。
 
-这点让我十分困惑，初见以为 gitea-runner 负责运行所有的 job，看得摸不着头脑。 
+这点让我十分困惑，初见以为 gitea-runner 负责运行所有的 job，看得摸不着头脑. 
 主要困惑在于 runner 是怎么让 jobs 以一个 docker 容器运行起来的. 根据多方资料查找, 完整逻辑为：
 
 
