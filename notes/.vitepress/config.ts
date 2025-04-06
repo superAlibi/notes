@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   lang: 'zh-CN',
@@ -9,13 +8,16 @@ export default defineConfig({
     server: {
       host: true,
       allowedHosts: ['wj14x.lucardo.xyz']
-    }
+    },
   },
   head: [
     ['link', { rel: 'icon', href: '/vite.svg' }],
   ],
   themeConfig: {
     logo: '/vite.svg',
+    search: {
+      provider: 'local'
+    },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
