@@ -8,11 +8,11 @@ hero:
   tagline: 记录平时遇到的零碎问题以及最新的前端技术
   actions:
     - theme: brand
-      text: 留言
-      link: /markdown-examples
-    - theme: alt
-      text: 最近动态
+      text: 博客
       link: /blogs
+    # - theme: alt
+    #   text: 最近动态
+    #   link: /blogs
 
 features:
   - title: TypeScript
