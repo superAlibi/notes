@@ -221,7 +221,7 @@ Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -D
 2. `/etc/profile.d/default.env.sh`
 3. `/etc/systemd/system.conf.d/default-env.conf`
 
-导致每次我启动虚拟机时，即使没有开启 clash-verge，也会导致环境变量中存在 http-proxy 和 https-proxy，如果对 Linux 的 shell 启动时执行哪些脚本，就会导致一时找不到问题所在。
+导致每次我启动虚拟机时，即使没有开启 clash-verge，也会导致环境变量中存在 http-proxy 和 https-proxy，如果对 Linux 的 shell 启动时执行哪些脚本不熟悉，就会导致一时找不到问题所在( 没错,我就不熟悉这些脚本所在的位置 )。
 
 ## 参考资料
 
