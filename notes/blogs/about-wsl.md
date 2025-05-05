@@ -33,11 +33,25 @@ WSL 成为我开发过程中不可或缺的一部分。
 
 [官方文档](https://learn.microsoft.com/zh-cn/windows/wsl/install-manual) 有相对详细的具体描述，如果感兴趣可以查看，但是本文出于个人经验和踩坑历程，和官方文档中介绍顺序稍有不同。
 
-### 使用`启用或关闭 Windows 功能`启用 WSL
+### 使用 `启用或关闭 Windows 功能` 启用
 
-通过 Windows 搜索功能，搜索`启用或关闭 Windows 功能`，勾选`适用于 Linux 的 Windows 子系统`和`Virtual Machine Platform`。
+通过 Windows 搜索功能，搜索`启用或关闭 Windows 功能`，然后勾选`适用于 Linux 的 Windows 子系统`和`Virtual Machine Platform`。
 
-完毕后根据建议重启系统。
+完毕后根据提示重启系统。
+
+### 使用 `wsl --install` 启用
+
+根据[官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/install)，Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 后， 使用管理员 PowerShell 执行下面的命令即可。
+
+```powershell
+wsl --install
+```
+
+此行命令会在没有启用过 WSL 功能时，用来启用 WSL 功能。
+
+根据官方文档：[安装 WSL](https://learn.microsoft.com/zh-cn/windows/wsl/install#install-wsl-command) 和 [最佳安装实践](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started) 描述，此命令会自动安装虚拟机所需要的拓展: `适用于 Linux 的 Windows 子系统` 以及 `Virtual Machine Platform`（在 `启用或关闭 Windows 功能` 中）。
+
+根据我之前的经验，直接执行`wsl --install`命令，可能会产生无法理解的错误，比如[官方最佳安装实践教程](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started)所说，可能需要`重启` 😂。所以建议先通过前文[启用 WSL 功能](#enable-wsl) 所表述的步骤后，根据提示重启 Windows 物理机系统，然后通过 WSL 安装 Linux 发行版虚拟机。
 
 ### 更新 WSL
 
@@ -53,24 +67,11 @@ wsl --update
 
 ## 二. 安装 Linux 发行版虚拟机
 
-根据[官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/install)，Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 后，执行下面的 PowerShell 命令即可。
-
-```powershell
-wsl --install
-```
-
-此行命令会默认安装 Ubuntu 发行版，根据官方文档：[安装 WSL](https://learn.microsoft.com/zh-cn/windows/wsl/install#install-wsl-command) 和 [最佳安装实践](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started) 描述：会自动安装虚拟机所需要的拓展（启用或关闭 Windows 功能）。
-
-本文写作的必要原因在于，大部分 Windows 直接执行上面命令大概率会产生无法理解的错误，比如教程第一小节所说的，可能需要`重启` 😂。根据之前的经验折磨怕了，
-所以建议先通过[启用 WSL 功能](#enable-wsl) 后，根据提示重启 Windows 物理机系统，然后通过 WSL 安装 Linux 发行版虚拟机。
-
-在本文撰写前些日子，WSL 实际使用上还有不少坑。不过截至目前已经修复得差不多了，读者遇到问题或多或少可以在官方文档中找到解决办法，所以不用太担心。
-
 接下来通过 MS Store 或 PowerShell 安装 GNU/Linux 发行版到 WSL 中。
 
 ### 在 MS Store 安装
 
-直接搜索 WSL，会有相应的发行版内置在商店中，如果安装自定义的发行版，可能相对来说比较麻烦，一般 MS Store 的发行版都已经按照最佳实践配置好了，只需要启动时设置一下账号密码都能正常使用。
+直接搜索 WSL，会有相应的发行版内置在商店中，如果安装自定义的发行版，可能相对来说比较麻烦，一般 MS Store 的发行版都已经按照最佳实践配置好了，只需要在MS Store中启动时，设置一下账号密码就能正常使用。
 
 ### 在 PowerShell 中安装
 
@@ -80,7 +81,7 @@ wsl --install
 wsl --install 
 ```
 
-此命令行将默认安装 Ubuntu 的发行版。
+你可能会有疑问，此处的`wsl --install`命令，在之前不是用来启用 WSL 功能的吗？其实，在第一次执行wsl过后，wsl命令版本就发生了变化，此处为wsl 版本发生变化后的命令行，用来安装 Linux 发行版。如果不指定发行版名称，将默认安装 Ubuntu。
 
 ### 已安装 Linux 发行版，但无法启动
 
@@ -96,55 +97,80 @@ wsl --install
 wsl --unregister <Distro Name> 
 ```
 
+### 通过 MS Store 安装的虚拟机
+
+先通过 PowerShell 执行注销命令，
+
+```powershell
+wsl --unregister <Distro Name> 
+```
+
+然后通过 MS Store 卸载。
+
 ## 四. 我常用的设置
 
 ### 启用 systemd
 
-如果你通过 PowerShell/MS Store 安装，一般会自动配置了 WSL 使用 systemd。但是如果通过第三方，或者遇到了 MS Store / WSL 命令行安装的 WSL 虚拟机，没有预配置 systemd 启动，需要在 Linux 发行版虚拟机内，
-编辑 `/etc/wsl.conf`，此文件为 TOML 格式文件，在文件中写入
+如果你通过 PowerShell/MS Store 安装，一般会自动配置了 WSL 使用 systemd。但是如果通过第三方，或者遇到了 MS Store / WSL 命令行安装的 WSL 虚拟机，没有预配置 systemd 启动，需要在 Linux 发行版虚拟机内编辑 `/etc/wsl.conf` 文件，此文件为 TOML 格式文件，在文件中写入
 
 ```toml
 [boot]
 systemd=true
 ```
 
-保存后重启 Linux 虚拟机即可。
+保存后重启 Linux 虚拟机即可。重启步骤分为两步: `终止` 和 `启动`。因为没有直接的重启命令，因此两个步骤都需要手动进行。
 
-***终止 Distro Name（单个）虚拟机***
+***终止命令***
+
+终止 Distro Name（单个）虚拟机
 
 ```powershell
 wsl -t <Distro Name>
 ```
 
-**终止所有的 WSL 虚拟机**
+终止所有的 WSL 虚拟机
 
 ```powershell
 wsl --shutdown 
 ```
 
+***启动命令***
+
+启动指定名称的虚拟机：
+
+```powershell
+wsl -d <Distro Name>
+```
+
+启动默认的虚拟机：
+
+```powershell
+wsl
+```
+
 ### 安装 Cargo
 
-安装 rustup 工具包
+安装 Rustup 工具包：
 
-Cargo 可以通过 Rust 工具链管理工具 rustup 管理，所以优先使用 rustup 管理 Cargo，以便于后续升级。
+`Cargo` 可以通过 `Rust` 工具链管理工具 `Rustup` 管理，所以优先使用 `Rustup` 管理 `Cargo`，以便于后续升级。
 
 ```bash
 sudo apt install rustup
 ```
 
-通过 rustup 初始化 Cargo 环境
+通过 Rustup 初始化 Cargo 环境：
 
 ```bash
 rustup toolchain install stable
 ```
 
-如果以上安装太慢，可以在搜索引擎中搜索
+如果以上安装太慢，可以在搜索引擎中搜索：
 
 ```text
 rustup mirror proxy ustc
 ```
 
-这里我直接贴出 toolchain 的环境变量设置。
+这里我直接贴出 Toolchain 的环境变量设置。
 
 安装工具链时使用的环境变量
 
