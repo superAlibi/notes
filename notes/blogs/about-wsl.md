@@ -23,6 +23,7 @@ WSL 成为我开发过程中不可或缺的一部分。
 - 具备操作系统实践经验
 - 具备常见 GNU/Linux 操作系统实践经验
 - 了解 GNU/Linux 系统及其常见发行版
+- 了解 BIOS 概念
 
 关于 shell 脚本的约定：
 
@@ -51,11 +52,11 @@ wsl --install
 
 根据官方文档：[安装 WSL](https://learn.microsoft.com/zh-cn/windows/wsl/install#install-wsl-command) 和 [最佳安装实践](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started) 描述，此命令会自动安装虚拟机所需要的拓展: `适用于 Linux 的 Windows 子系统` 以及 `Virtual Machine Platform`（在 `启用或关闭 Windows 功能` 中）。
 
-根据我之前的经验，直接执行`wsl --install`命令，可能会产生无法理解的错误，比如[官方最佳安装实践教程](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started)所说，可能需要`重启` 😂。所以建议先通过前文[启用 WSL 功能](#enable-wsl) 所表述的步骤后，根据提示重启 Windows 物理机系统，然后通过 WSL 安装 Linux 发行版虚拟机。
+根据我之前的经验，直接执行`wsl --install`命令，可能会产生无法理解的错误，比如[官方最佳安装实践教程](https://learn.microsoft.com/zh-cn/windows/wsl/setup/environment#get-started)中就提到：`可能需要重启` 😂。所以建议先通过前文[启用 WSL 功能](#enable-wsl) 所表述第一种方式后，根据提示重启 Windows 物理机系统，然后通过 WSL 安装 Linux 发行版虚拟机。
 
 ### 更新 WSL
 
-一般来说，初始系统中的 WSL 版本相对较旧，可能也就低于当前最新版 1 - 2 个子版本。
+一般来说，初始系统中的 WSL 版本相对较旧，最多也就低于当前最新版 1 - 2 个子版本。
 
 在准备好安装 WSL 虚拟机前，最好使用 PowerShell 更新下 WSL 本身。
 
@@ -71,7 +72,7 @@ wsl --update
 
 ### 在 MS Store 安装
 
-直接搜索 WSL，会有相应的发行版内置在商店中，如果安装自定义的发行版，可能相对来说比较麻烦，一般 MS Store 的发行版都已经按照最佳实践配置好了，只需要在MS Store中启动时，设置一下账号密码就能正常使用。
+直接搜索 WSL，会有相应的发行版内置在商店中，如果安装自定义的发行版，相对来说比较麻烦，一般 MS Store 的发行版都已经按照最佳实践配置好了，只需要在MS Store中启动时，设置一下账号密码就能正常使用。
 
 ### 在 PowerShell 中安装
 
@@ -85,9 +86,14 @@ wsl --install
 
 ### 已安装 Linux 发行版，但无法启动
 
-如果你在官方文档中找不到任何依据的安装问题，可能还需要
+如果你在官方文档中找不到任何依据的安装问题，但就是无法启动，那么可能需要检查 BIOS 设置，确保虚拟化功能开启。
 
-- 设置 BIOS 开启虚拟化（此功能在支持的机器上基本默认开启，除非个人修改过 🧐）
+
+:::info 关于 BIOS 设置
+BIOS 中的虚拟化功能在支持的机器上基本默认开启，除非个人修改过 🧐
+:::
+
+除此以外，如果无法启动，可以尝试重启系统，或者重新安装 WSL。如果还是无法启动，请根据虚拟机启动错误找到可能的信息。
 
 ## 三. 卸载 WSL 虚拟机
 
@@ -193,7 +199,7 @@ fnm 的 [GitHub 仓库](https://github.com/Schniz/fnm) 有详细的说明。再�
 ### 通过 Cargo 安装 Deno
 
 我在[使用 Cargo 安装 Deno](/blogs/install-deno) 中详细描述了安装构成，本文不再赘述。
-Deno 使用 Rust 构建，内置 TypeScript 支持，能直接运行 TS 程序，无需编译，且尽量往浏览器原生 API 靠拢（后证明此行为可能导致开发者难以区分浏览器或服务器的宿主环境，部分 API 向 Node.js 靠拢了 QAQ）。
+Deno 使用 Rust 构建，内置 TypeScript 支持，能直接运行 TS 程序，无需编译，且尽量往浏览器原生 API 靠拢（后证明此行为导致开发者混淆浏览器或服务器的宿主环境，导致部分 API 向 Node.js 靠拢了 QAQ）。
 
 ### 启用镜像网络
 
