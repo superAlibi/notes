@@ -12,7 +12,7 @@ hero:
       link: /markdown-examples
     - theme: alt
       text: 最近动态
-      link: /api-examples
+      link: /blogs
 
 features:
   - title: TypeScript

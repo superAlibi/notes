@@ -45,8 +45,10 @@ export default defineConfig({
         link: '/blogs',
         items: [
           { text: '安装postgresql', link: '/blogs/install-pg' },
-          { text: '使用cargo安装deno', link: '/blogs/install-deno' },
           { text: '使用gitea承包DevOps', link: '/blogs/about-gitea' },
+          { text: '使用wsl', link: '/blogs/about-wsl' },
+          { text: '使用fnm管理node', link: '/blogs/about-fnm' },
+          { text: '使用cargo安装deno', link: '/blogs/install-deno' },
         ]
       },
     ],
