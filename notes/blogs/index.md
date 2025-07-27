@@ -12,3 +12,4 @@ outline:
 6. [关于print css](/blogs/about-print-css)
 7. [关于dnf](/blogs/about-dnf)
 8. [关于文件系统树标准](/blogs/about-fs)
+9. [TCP/IP详解 卷一:协议 笔记](/blogs/comput-tcpip-protocols)
