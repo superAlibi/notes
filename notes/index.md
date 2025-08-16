@@ -30,7 +30,7 @@ features:
   - title: TailwindCSS
     details: 原子化css框架,在任何规模的项目中均会使用.减少重复的class命名
     link: https://tailwindcss.com/
-  - title: pinia
-    details: vue生态全局状态管理框架
-    link: https://pinia.vuejs.org/zh/
+  - title: deno
+    details: node的弟弟, 可以直接运行typescript, 被设计为远程引用远程ts模块
+    link: https://deno.com/
 ---
