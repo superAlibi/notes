@@ -21,7 +21,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '练习案例', link: '/practice-case' },
+      { text: '公共服务', link: '/public-service' },
       { text: '博客', link: '/blogs' },
     ],
 
@@ -32,24 +32,12 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        text: '练习案例',
-        link: '/practice-case',
-        items: [
-          { text: 'makdown的例子', link: '/practice-case/markdown-examples' },
-          { text: 'api的例子', link: '/practice-case/vitepress-runtime-api' },
-          { text: '在vitepress中使用vue', link: '/practice-case/vitepress-use-vue' },
-        ]
+        text: '公共服务',
+        link: '/public-service',
       },
       {
         text: '博客',
         link: '/blogs',
-        items: [
-          { text: '安装postgresql', link: '/blogs/install-pg' },
-          { text: '使用gitea承包DevOps', link: '/blogs/about-gitea' },
-          { text: '使用wsl', link: '/blogs/about-wsl' },
-          { text: '使用fnm管理node', link: '/blogs/about-fnm' },
-          { text: '使用cargo安装deno', link: '/blogs/install-deno' },
-        ]
       },
     ],
     outline: {
