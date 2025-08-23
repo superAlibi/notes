@@ -31,14 +31,14 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/superAlibi' }
     ],
     sidebar: [
-      {
+      /* {
         text: '公共服务',
         link: '/public-service',
       },
       {
         text: '博客',
         link: '/blogs',
-      },
+      }, */
     ],
     outline: {
       label: '内容概要'

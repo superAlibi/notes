@@ -663,3 +663,12 @@ compileJava - Compiles main Java source.
 ### 十、[构建扫描](https://docs.gradle.org/current/userguide/build_scans.html)
 
 将构建问题上传到 Gradle 云，Gradle 云可以分享构建配置依赖和分析构建过程。初级阶段可能需要，因为分享功能意味着可以让别人帮你找问题。
+
+
+## 依赖关系管理
+
+### 一. 声明依赖关系
+
+### 二. 依赖作用域
+
+### 三. 依赖仓库源配置
