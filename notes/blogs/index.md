@@ -1,17 +1,63 @@
 ---
-layout: doc
-outline:
-  level: 2
+layout: home
+hero:
+  name: 笔记&博客
+  # text: 前端,后端,数据库,操作系统
+  tagline: 随便写点. 前端,后端,数据库,操作系统都有
+  # image:
+  #   src: /vite.svg
+  #   alt: VitePress
+  actions:
+
+    - theme: alt
+      text: 去github看看
+      link: https://github.com/superAlibi
+
+features:
+  - icon: 
+      src: https://www.postgresql.org/media/img/about/press/elephant.png
+    title: 在Linux上安装postgresql
+    details: 它比mysql更符合ANSI SQL,因为其强大和灵活的配置和插件系统,导致其配置文件相当复杂.默认配置非常安全!
+    link: /blogs/install-pg.md
+  - icon:
+      src: /blogs/deno/logo.svg
+      alt: deno icon
+      width: 150
+    title: 使用cargo安装deno
+    details: Rust 提供了 Cargo 这样的二进制安装工具，可以使用 Cargo 安装 Deno。
+    link: /blogs/install-deno
+  - icon: 🐧
+    title: wsl简介
+    details: WSL 成为我开发过程中不可或缺的一部分。
+    link: /blogs/about-wsl
+  - icon: 
+      src: /blogs/nodejs/logo.png
+    title: Fast Node Manager
+    details: 是一个用于管理 Node.js 版本的工具， 用 `Rust` 编写
+    link: /blogs/about-fnm
+  - icon: 
+      src: /blogs/npm.png
+    title: http js 请求工具
+    details: Ky是一个基于Fetch API的小型优雅HTTP客户端
+    link: /blogs/fetcher-ky
+  - icon: 
+      src: /blogs/ip-tcp/image.svg
+    title: TCP/IP 详解 - 卷一：协议
+    details: 实体书 TCP/IP 详解 - 卷一：协议(第二版)的阅读笔记，会对内容删减不再重要的部分。因本书原版出版于 2016 年，且计算机领域发展至今已经发生了很多变化。
+    link: /blogs/comput-tcpip-protocols/index
+  - icon: 
+      src: /blogs/gradle.png
+    title: gralde 简介
+    details: 想学习一下 Kotlin，发现可以使用 Gradle 快速启动一个 Kotlin 项目。发现其文档逻辑思路和导航非常清晰且友好
+    link: /blogs/gradle
+  
 ---
 
-1. [在Linux上安装postgresql](/blogs/install-pg)
-2. [使用cargo安装deno](/blogs/install-deno)
-3. [关于wsl](/blogs/about-wsl)
-4. [关于fnm](/blogs/about-fnm)
-5. [关于gitea](/blogs/about-gitea)
-6. [关于print css](/blogs/about-print-css)
-7. [关于dnf](/blogs/about-dnf)
-8. [关于文件系统树标准](/blogs/about-fs)
-9. [TCP/IP详解 卷一:协议 笔记](/blogs/comput-tcpip-protocols/index)
-10. [gradle简介](/blogs/gradle)
-11. [npm 包 ky 使用笔记](/blogs/fetcher-ky)
+
+## 待完善博客
+
+- [关于dnf](/blogs/about-dnf)
+- [关于文件系统树标准](/blogs/about-fs)
+- [关于print css](/blogs/about-print-css)
+- [gradle](/blogs/gradle)
+- [TCP/IP 详解 - 卷一：协议](/blogs/comput-tcpip-protocols/index)
