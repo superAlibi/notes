@@ -16,7 +16,12 @@ outline: [2,3]
 
 - 了解 [Response](https://developer.mozilla.org/zh-CN/docs/Web/API/Response) 对象
 - 熟悉 [Fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch)
-- 了解 `XMLHttpRequest` 与 `Fetch` 的区别
+- 了解 [XMLHttpRequest](https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest) 与 [Fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch) 的区别
+- 了解 [web stream api](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
+- 了解 [原型链](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain)
+- 了解 [deno](https://deno.com)
+
+<!-- 本文案例可参考在线项目 -->
 
 本文在案例中发起实际请求时，会使用服务器进行验证。服务器运行于 Deno，项目结构如下：
 
@@ -33,7 +38,7 @@ outline: [2,3]
 └── main.ts
 ```
 
-`deno.json` 文件包含了 Deno 运行时的依赖和项目的启动命令：
+`deno.json` 文件包含了 Deno 运行时的依赖和项目的快捷任务：
 
 ```json
 {
@@ -47,11 +52,11 @@ outline: [2,3]
 }
 ```
 
-JSON 文件中描述了启动本服务器的命令 `dev`，以及对 [h3](https://h3.dev/) 库的依赖。h3 是一款轻量级的 Web 服务器，本文案例背后的服务器使用的就是 h3。
+JSON 文件中描述了启动项目的脚本命令 `dev`，以及对 [h3](https://h3.dev/) 库的依赖。h3 是一款轻量级的 Web 服务器，本文案例经过实际服务器测试, 背后即基于 deno 运行的 h3。
 
 **main.ts**
 
-```typescript{9-19}
+```typescript{10-15}
 import { H3, serve } from "h3";
 import successResponse from "./apps/success.ts";
 import redirectResponse from "./apps/redirect.ts";
@@ -71,18 +76,13 @@ app.mount("*", successResponse);
 serve(app, { port: 3000 });
 ```
 
-其中 main 文件声明了很多前缀，详情见 [GitHub](https://github.com/superAlibi/deno_h3.git)。
+其中 main 文件声明了很多子服务前缀，详情见 [github/superAlibi/deno_h3](https://github.com/superAlibi/deno_h3.git)。
 
 ## 设计理念
 
 Ky 在设计时，参数与 Fetch API 是兼容的，但又对 Fetch 的第二个参数进行了拓展。
 
-Ky 在原型上拓展了 HTTP 方法同名的方法，例如：
-
-- `ky.post(url, options)`
-- `ky.get(url, options)`
-- `ky.put(url, options)`
-- `ky.patch(url, options)`
+Ky 在原型上拓展了 HTTP 方法同名的方法，例如：`ky.post(url, options)`
 
 可以说，Ky 是对 Fetch API 实用性的拓展。即使 Fetch API 已经很不错，但 Ky 用起来会更加顺手！
 
