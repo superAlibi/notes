@@ -669,6 +669,162 @@ compileJava - Compiles main Java source.
 
 ### 一. 声明依赖关系
 
+#### 生产者和消费者概念
+
+此概念在很多的地方的概念是相似的. 比喻一个数据产生和数据查看的关系. 
+
+当你构建一个基础库给他人使用时，你充当生产者，库将被其他人（消费者）使用的组件。
+
+当你在使用某个依赖时, 使用这个行为就充当了消费者.
+
+消费者可以广义地定义为：
+
+- 依赖于其他项目的项目。
+- 声明对特定工件的依赖关系的配置。
+
+![producer and cusumer](https://docs.gradle.org/current/userguide/img/declaring-dependencies-1.png)
+
+#### 添加依赖项
+
+在gradle中, 添加依赖需要在构建脚本 `dependencies{}` 块中声明.
+
+dependencies块允许您指定各种类型的依赖项，例如外部库、本地 JAR 文件或多项目构建中的其他项目。
+
+
+Gradle 中的外部依赖项使用 配置依赖作用域函数（例如 implementation、compileOnly 、testImplementation ）, 后跟依赖项表示法（包括组 ID（组）、工件 ID（名称）和版本）进行声明。
+
+
+```kotlin
+dependencies {
+    // Configuration Name + Dependency Notation - GroupID : ArtifactID (Name) : Version
+    configurationName('<group>:<name>:<version>')
+}
+```
+
+注意：
+
+- Gradle 会自动包含可传递依赖项，这些依赖项可能是依赖本身引用了其他依赖项。
+- Gradle 为依赖项提供了多种依赖类型，这些选项定义了依赖项的使用范围，例如编译时的依赖、运行时依赖或特定于测试的依赖场景。
+- 您可以指定 Gradle 应在构建文件中查找依赖项的代码库。
+
+#### 依赖来源
+
+共存在三种依赖源, 远程仓库,子项目和本地文件
+
+**远程仓库依赖**
+
+远程仓库依赖是最常见的依赖. 它们引用远程仓库中的模块
+```kotlin
+dependencies {
+    implementation("org.codehaus.groovy:groovy:3.0.5")
+    implementation("org.codehaus.groovy:groovy-json:3.0.5")
+    implementation("org.codehaus.groovy:groovy-nio:3.0.5")
+}
+```
+
+**子项目依赖**
+
+项目依赖项允许您声明同一生成中其他项目的依赖项。 这在多个项目属于同一 Gradle build 的多项目构建中非常有用。
+
+项目依赖项是通过引用项目路径来声明的：
+
+```kotlin
+dependencies {
+    implementation(project(":utils"))
+    implementation(project(":api"))
+}
+```
+
+**本地文件依赖**
+
+在某些项目中，您可能不依赖 [JFrog Artifactory](https://jfrog.com/artifactory/) 或 [Sonatype Nexus](https://www.sonatype.com/products/sonatype-nexus-repository) 等二进制存储库产品来托管和解析外部依赖项。相反，您可以将这些依赖项托管在共享驱动器上，或者将它们与项目源代码一起签入版本控制。
+
+这些称为文件依赖项，因为它们表示没有任何元数据（例如有关可传递依赖项、来源或作者的信息）的文件。
+
+![dependency management file dependencies](https://docs.gradle.org/current/userguide/img/dependency-management-file-dependencies.png)
+
+要将文件添加为配置的依赖项，只需将[文件集合](https://docs.gradle.org/current/userguide/working_with_files.html#sec:file_collections)作为依赖项传递：
+
+```kotlin
+dependencies {
+    runtimeOnly(files("libs/a.jar", "libs/b.jar"))
+    runtimeOnly(fileTree("libs") { include("*.jar") })
+}
+```
+
+一个列子可在[官方文档](https://docs.gradle.org/current/userguide/declaring_dependencies.html#looking_at_an_example)查看
+
 ### 二. 依赖作用域
 
-### 三. 依赖仓库源配置
+为 Gradle 项目声明的每个依赖项都适用于特定范围。
+
+例如，某些依赖项应用于编译源代码，而其他依赖项只需要在运行时可用：
+
+```kotlin
+dependencies {
+    implementation("com.google.guava:guava:30.0-jre")   // Needed to compile and run the app
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.13")        // Only needed at runtime
+}
+```
+
+依赖项配置是一种为项目中的不同目的定义不同依赖项集的方法。 它们决定在构建过程的各个阶段如何以及何时使用依赖项。
+
+配置是 Gradle 中依赖关系解析的基本组成部分。
+
+
+了解依赖配置作用域函数
+
+#### 依赖项声明配置
+
+Gradle 提供了多种依赖配置，每种配置都有特定的用途和作用域：
+
+| 配置名称 | 描述 | 用于: |
+|---------|------|-------|
+| `api` | 编译和运行时所需的依赖项，并包含在已发布的API中。 | 声明依赖项 |
+| `implementation` | 编译和运行时所需的依赖项。 | 声明依赖项 |
+| `compileOnly` | 仅编译所需的依赖项，不包含在运行时或发布中。 | 声明依赖项 |
+| `compileOnlyApi` | 仅编译时需要依赖项，但包含在已发布的API中。 | 声明依赖项 |
+| `runtimeOnly` | 依赖项仅在运行时需要，不包含在编译类路径中。 | 声明依赖项 |
+| `testImplementation` | 编译和运行测试所需的依赖项。 | 声明依赖项 |
+| `testCompileOnly` | 仅测试编译所需的依赖项。 | 声明依赖项 |
+| `testRuntimeOnly` | 仅运行测试所需的依赖项。 | 声明依赖项 |
+
+**常用配置说明：**
+
+- **`api`**: 当你的模块需要向其他模块暴露依赖时使用，依赖会传递给使用你的模块的其他模块
+- **`implementation`**: 最常用的配置，依赖不会传递给其他模块，推荐使用
+- **`compileOnly`**: 仅编译时需要，如注解处理器，不会打包到最终的 APK/JAR 中
+- **`runtimeOnly`**: 仅运行时需要，如数据库驱动，编译时不需要
+
+#### 查看某作用域依赖
+
+```bash
+./gradlew -q app:dependencies --configuration implementation
+```
+
+### 三. 仓库源配置
+
+Gradle 需要知道可以在哪里下载项目中使用的依赖项。
+
+例如，可以从公共Maven Central存储库mavenCentral（）下载com.google.guava:guava:30.0-jre依赖项。Gradle将从MavenCentral找到并下载 `guava` 源代码（作为一个jar），并使用它构建项目。
+
+通过在build.gradle（.kts）文件中配置存储库块，可以为依赖项添加任意数量的存储库：
+
+
+```kotlin
+repositories {
+    mavenCentral()                              [1]
+    maven {                                     [2]
+        url = uri("https://company/com/maven2")
+    }
+    mavenLocal()                                [3]
+    flatDir {                                   [4]
+        dirs("libs")
+    }
+}
+```
+
+- [1] 公共仓库
+- [2] 私有/自定义仓库
+- [3] 本地仓库
+- [4] 本地文件

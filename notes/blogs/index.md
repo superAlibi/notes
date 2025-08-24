@@ -37,7 +37,7 @@ features:
     link: /blogs/about-fnm
   - icon: 
       src: /blogs/npm.png
-    title: http js 请求工具
+    title: http 请求工具 ky
     details: Ky是一个基于Fetch API的小型优雅HTTP客户端
     link: /blogs/fetcher-ky
   - icon: 
@@ -59,5 +59,5 @@ features:
 - [关于dnf](/blogs/about-dnf)
 - [关于文件系统树标准](/blogs/about-fs)
 - [关于print css](/blogs/about-print-css)
-- [gradle](/blogs/gradle)
 - [TCP/IP 详解 - 卷一：协议](/blogs/comput-tcpip-protocols/index)
+- [前端monorepo仓库](/blogs/monorepo)
