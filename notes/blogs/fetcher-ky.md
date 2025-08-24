@@ -404,6 +404,59 @@ await ky('https://example.com', {
 });
 ```
 
+## onUploadProgress
+
+此功能也算对fetch 不支持 上传进度的弥补. 本质上该请求使用的也是 stream api 实现的. 通过上传chun, 与请求体的总size进行比较, 得出的上传进度. 但是 fetch 为什么不提供像 XMLHttpRequest 那样的 onUploadProgress 呢? 究其根本,
+是因为 fetch 这样的基于 http 协议, 本质上不可能知道在网络的链路层究竟成功发送了多少数据帧. 因此 上传进度是不可靠的. 故在设计时, 就没有该功能.
+
+函数有进度统计对象 和 已发送数据的 TypedArray 实例两个参数：
+
+- 进度是具有以下属性的对象：
+  - percent 是介于0和1之间的数字，表示进度百分比。
+  - transferredBytes是到目前为止传输的字节数。
+  - totalBytes是要传输的字节总数。这是一个估计值，如果无法确定总大小，则可能为0。
+- chunk是包含发送的数据的Uint8Array的实例。注意：第一次发送时它是空的。
+
+```typescript
+import ky from 'ky';
+
+const response = await ky('https://example.com', {
+	onDownloadProgress: (progress, chunk) => {
+		// Example output:
+		// `0% - 0 of 1271 bytes`
+		// `100% - 1271 of 1271 bytes`
+		console.log(`${progress.percent * 100}% - ${progress.transferredBytes} of ${progress.totalBytes} bytes`);
+	}
+});
+```
+
+## onDownloadProgress
+
+本质上下载进度也是将 Response 对象的 Stream api 作为底层技术实现的. 
+
+函数有进度统计和已发送数据 TypedArray 实例两个参数：
+
+- 进度统计对象是具有以下属性的对象：
+  - percent 是介于0和1之间的数字，表示进度百分比。
+  - transferredBytes是到目前为止传输的字节数。
+  - totalBytes是要传输的字节总数。这是一个估计值，如果无法确定总大小，则可能为0。
+- chunk是包含发送的数据的Uint8Array的实例。注意：第一次发送时它是空的。
+
+```typescript
+import ky from 'ky';
+
+const response = await ky.post('https://example.com/upload', {
+	body: largeFile,
+	onUploadProgress: (progress, chunk) => {
+		// Example output:
+		// `0% - 0 of 1271 bytes`
+		// `100% - 1271 of 1271 bytes`
+		console.log(`${progress.percent * 100}% - ${progress.transferredBytes} of ${progress.totalBytes} bytes`);
+	}
+});
+```
+
+
 ## 拓展实例（extend）
 
 创建一个新的 Ky 实例，其中一些默认值被您自己的覆盖。
