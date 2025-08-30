@@ -567,87 +567,98 @@ await kyInstance('success/201');
 
 该对象只会在服务器正确响应的情况下才会出现此错误，所以当网络不可达时，Ky 可能不会抛出此异常。
 
+
 ## Response 使用简介
 
-由于ky 是对fetch的拓展, 故ky对请求结果的行为与fetch api是保持一致的. 与 axios ofetch等其他工具不同. fetch api 将请求结果的处置权交给用户处理.
+由于 Ky 是对 `fetch` 的扩展，因此 Ky 对请求结果的处理行为与 Fetch API 保持一致。这与 Axios、ofetch 等其他工具不同。Fetch API 将请求结果的处置权完全交给用户。
 
-如何理解这句话, 这里可以参考 axios 的 option 参数有一个名为 [responseType 的参数](https://axios-http.com/zh/docs/req_config), 可选值有: ` 'arraybuffer', 'document', 'json', 'text', 'stream', 'blob'` 表明 需要axios 对响应结果按照什么格式解析, 并作为调用函数的响应结果.  例如将传入responseType 赋值为 'blob' 
+### 如何理解这一点？
 
-```typescript
-import axios from 'axios'
-axios.post('/api/success/200',{responseType:'blob'})
-// => 响应结果将按照blob解析后并返回
-```
-
-以上调用将会返回一个blob对象
-
-到目前为止, 此结果似乎似乎没有什么不对, 也符合大部分常见需要.
-
-但是, 假设此次调用服务器方因为某种原因出现了错误. 实际返回结果是按照json返回的.
-
-那么此次调用结果仍然按照blob格式返回, 就不满足本次调用的需要了.
-
-如果你熟悉axios, 或许你会说这个问题可以在 [response hook](https://axios-http.com/zh/docs/interceptors) 中进行拦截! 可以这么做, 除非你的hook中编写了各种应对业务端的判断!
-这显然会增加hook部分的复杂度.
-
-我举以上例子是想提出 Response API. 假设对于调用时不关心最终会返回什么样的数据. 只关心此次调用是否已经达到 http 服务器并返回了响应, 而不关心数据内容是什么. 这不是调用数据时应该考虑的事情. 调用 数据 并返回数据是 http 层面应该考虑的事情, 而数据处理是业务层应该处理的事情.
-
-总结来说, fetch api 本身只关注 http 请求本身,  而不关注数据. 因此 fetch api 对于单次调用请求内容和响应结果(数据)是不关心的, 即使 404 响应, 那么此次 http 调用就是成功的! 至于响应结果为 404 , 这不是本次调用操作这个行为应该关注的事情.
-
-那么对于 fetch 来说 网络出现错误时, 即网络本身发生了错误, 或其它不可抗力无法完整完成一次请求, 比如服务器不可达, 那么调用才是是失败的.  否则只要http server响应了结果, 那么 本次请求就是完整的. 即具备返回 Response 对象的条件. 而不论 http 响应了什么内容.
-
-至此,对于 fetch api 在完整的进行了一次http 请求和响应的情况下, 将 `响应结果` 封装为了一个Response 对象.  用户此时 才应该对 响应结果关注并对结果进行处理. response 对象有一些实例方法, 可以将原始内容按照常见使用场景进行解析或格式化.
-
-由此, 基于以上 fetch api 设计原则, 对请求和处理的分离, 是编程中常见的设计与编程原则. 不论在何种规模的编码中, 此概念均能提升代码工程的质量和可维护性.
-
-ky 本质上是对 fetch api 的拓展, 故 ky 也是将响应结果按照 继承于 Promise 的 Response 对象进行返回的. 下文将使用 ky 介绍对 Response 对象进行介绍
-
-### 按照json解析
-
-例如 对 响应内容 Response 对象调用 json 方法, 就是表明将 response 按照 json 格式解析, 并返回 JavaScript 对象 
+以 Axios 为例，其配置选项中有一个名为 [`responseType`](https://axios-http.com/zh/docs/req_config) 的参数，可选值包括：`'arraybuffer'`、`'document'`、`'json'`、`'text'`、`'stream'`、`'blob'`。该参数用于指定 Axios 应如何解析响应结果，并将其作为函数调用的返回值。例如，若将 `responseType` 设置为 `'blob'`：
 
 ```typescript
-const resp = KyInstance('success/200')
-const jsonObj = await resp.json()
+import axios from 'axios';
+
+axios.post('/api/success/200', { responseType: 'blob' });
+// 响应结果将被解析为 Blob 对象后返回
 ```
 
-以上调用结果 jsonObj
+以上调用将返回一个 Blob 对象。
+
+到目前为止，这种做法似乎没有问题，也符合大多数常见需求。
+
+然而，假设服务器因某种原因返回了错误，实际响应内容是 JSON 格式，但此次调用仍按 Blob 格式解析返回，就无法满足本次调用的需求了。
+
+熟悉 Axios 的人可能会说，可以在 [响应拦截器（response hook）](https://axios-http.com/zh/docs/interceptors) 中处理这个问题。确实可以，但这意味着你需要在拦截器中编写各种针对业务逻辑的判断，显然会增加其复杂度。
+
+我举这个例子是为了引出 **Response API** 的设计理念。在调用时，我们不应关心最终返回的数据格式，而应只关注此次调用是否已成功到达 HTTP 服务器并获得了响应。数据处理是业务层应关心的事情，而不应在 HTTP 调用时过度关注。
+
+总的来说，Fetch API 只关注 HTTP 请求本身，而不关心具体的数据内容。因此，即使响应状态为 404，只要服务器返回了响应，本次 HTTP 调用就是成功的。至于响应内容为 404，这不是本次调用行为本身应关注的事情。
+
+只有当网络出现错误（如服务器不可达）或其他不可抗力导致请求无法完成时，本次调用才是失败的。只要 HTTP 服务器返回了响应，本次请求就是完整的，并会返回一个 `Response` 对象，无论其内容是什么。
+
+基于这一设计原则，Fetch API 将请求与处理分离，符合常见的编程与设计原则。这种分离在不同规模的代码工程中都能提升代码质量和可维护性。
+
+Ky 本质上是对 Fetch API 的扩展，因此 Ky 也将响应结果以继承自 `Promise` 的 `Response` 对象形式返回。下文将使用 Ky 介绍 `Response` 对象的常见用法。
+
+---
+
+### Response 常用解析方法
+
+#### 按 JSON 解析
+
+对 `Response` 对象调用 `.json()` 方法，可将响应内容解析为 JSON 格式，并返回 JavaScript 对象：
+
+```typescript
+const resp = ky('success/200');
+const jsonObj = await resp.json();
+```
+
+解析结果 `jsonObj` 示例：
+
 ```javascript
 {
-  "serach": {},
+  "search": {},
   "body": null,
   "message": "this is json response"
 }
 ```
 
-### 按照纯文本解析
+#### 按纯文本解析
 
-例如 想对响应结果按照text解析, 将返回字符串, 可以理解为该字符串使用过 ***`*** 符号包裹过
+若想将响应结果按文本解析，可调用 `.text()` 方法，返回字符串（相当于用反引号包裹的原始文本）：
 
 ```text
-{"serach":{},"body":null,"message":"this is text response"}
+{"search":{},"body":null,"message":"this is text response"}
 ```
 
+#### 按 ArrayBuffer 解析
 
-### 按照 ArrayBuffer 返回
-又比如, 希望结果按照 ArrayBuffer 返回
+若希望结果以 `ArrayBuffer` 形式返回：
 
 ```typescript
-kyInstance.post('success/200').arrayBuffer().then(buffer => {
-  console.log('buffer', buffer);
-})
+ky.post('success/200')
+  .arrayBuffer()
+  .then(buffer => {
+    console.log('buffer', buffer);
+  });
 ```
 
-### 按照 ReadableStream 返回
+#### 按 ReadableStream 解析
 
-或者对响应的内容是不间断的数据流, 希望获得一个 ReadableStream, 只需要对 Response对象取值body即可
+若响应内容为不间断的数据流，可通过 `Response` 对象的 `body` 属性获取 `ReadableStream`：
 
 ```typescript
-kyInstance.post('success/200').then((resp)=>{
-  resp.body
-})
+ky.post('success/200')
+  .then(resp => resp.body);
 ```
 
-### 参考连接
 
-- [Response 对象](https://developer.mozilla.org/zh-CN/docs/Web/API/Response)
+
+### 参考链接
+
+Ressponse 对象还有其他的常见属性，可以辅助判断一个响应解析方法，比如ok属性和headers属性。
+
+- [Response 对象 - MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Response)
+
+
