@@ -12,14 +12,17 @@ outline: [2,3]
 
 ## 说明
 
-**流畅阅读本文所有案例，读者需要具备以下知识储备：**
+**若想流畅阅读本文所有案例，读者需具备以下知识储备：**
 
+- 熟悉 [fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch): [使用fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch)
+- 熟悉 [HTTP 协议 方法(method)](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Methods)
+- 熟悉 [FormData](https://developer.mozilla.org/zh-CN/docs/Web/API/FormData) 对象
 - 了解 [Response](https://developer.mozilla.org/zh-CN/docs/Web/API/Response) 对象
-- 熟悉 [Fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch)
-- 了解 [XMLHttpRequest](https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest) 与 [Fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch) 的区别
-- 了解 [web stream api](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
-- 了解 [原型链](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain)
+- 了解 [XMLHttpRequest API](https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest) 与 [fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch) 的区别
+- 了解 [WEB Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
+- 了解 [JavaScript 原型链](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain)
 - 了解 [deno](https://deno.com)
+- 了解 [h3](https://h3.dev/) 代码工具库
 
 <!-- 本文案例可参考在线项目 -->
 
@@ -82,7 +85,7 @@ serve(app, { port: 3000 });
 
 Ky 在设计时，参数与 Fetch API 是兼容的，但又对 Fetch 的第二个参数进行了拓展。
 
-Ky 在原型上拓展了 HTTP 方法同名的方法，例如：`ky.post(url, options)`
+Ky 在 [原型](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Inheritance_and_the_prototype_chain) 上拓展了 [HTTP 方法](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Methods) 同名的方法（面向对象编程概念中的对象函数, 亦称方法），例如：`ky.post(url, options)`
 
 可以说，Ky 是对 Fetch API 实用性的拓展。即使 Fetch API 已经很不错，但 Ky 用起来会更加顺手！
 
@@ -102,7 +105,9 @@ Ky 在原型上拓展了 HTTP 方法同名的方法，例如：`ky.post(url, opt
 
 ## 常用参数
 
-这里的常用参数实际上是指 Ky 方法的第二个参数，也就是 `options`。第一个参数表示字符串请求地址、[Request](https://developer.mozilla.org/zh-CN/docs/Web/API/Request) 对象或 [URL](https://developer.mozilla.org/zh-CN/docs/Web/API/URL) 对象。
+下文提到的所有的常用参数，实际上是指 Ky 方法的第二个参数，也就是 `options`。
+
+而第一个参数表示字符串请求地址、[Request](https://developer.mozilla.org/zh-CN/docs/Web/API/Request) 对象或 [URL](https://developer.mozilla.org/zh-CN/docs/Web/API/URL) 对象。 本文不再介绍
 
 ### body
 
@@ -128,7 +133,7 @@ kyInstance('success/200', {
     name: 'lucardo',
     age: '20'
   })
-}).json();
+})
 
 // 或者
 kyInstance.post('success/200', { // [!code warning]
@@ -136,7 +141,7 @@ kyInstance.post('success/200', { // [!code warning]
     name: 'lucardo',
     age: '20'
   })
-}).json();
+})
 ```
 
 发送包含文件的表单或 `multipart/form-data` 格式的 body：
@@ -146,7 +151,7 @@ const formData = new FormData();
 formData.append('name', 'lucardo');
 formData.append('age', '20');
 
-kyInstance.post('success/200', { body: formData }).json();
+kyInstance.post('success/200', { body: formData });
 ```
 
 使用 `body` 发送 JSON 数据时，需要手动设置 header：
@@ -173,7 +178,7 @@ kyInstance.post('success/200', {
     name: 'lucardo4',
     age: '20'
   }
-}).json();
+});
 ```
 
 使用 `json` 属性可以免去调用 `JSON` 对象手动序列化，同时还可以免去设置 header。因此，在现代开发中，此属性应该会更常用一些。
@@ -191,7 +196,7 @@ kyInstance('success/200', {
     name: 'lucardo6',
     age: '20'
   }
-}).json();
+});
 ```
 
 传入 `searchParams` 后，发送的实际 URL 为 `/api/success/200?name=lucardo6&age=20`。
@@ -495,7 +500,7 @@ const extended = original.extend({
   }
 });
 
-const response = await extended(url).json();
+const response = await extended(url);
 //=> after 1
 //=> after 2
 
@@ -551,10 +556,10 @@ const newInstance = kyInstance.create({
   }
 });
 
-await newInstance('success/201').json();
+await newInstance('success/201');
 // => new beforeRequest
 
-await kyInstance('success/201').json();
+await kyInstance('success/201');
 // => base beforeRequest
 ```
 
@@ -562,3 +567,87 @@ await kyInstance('success/201').json();
 
 该对象只会在服务器正确响应的情况下才会出现此错误，所以当网络不可达时，Ky 可能不会抛出此异常。
 
+## Response 使用简介
+
+由于ky 是对fetch的拓展, 故ky对请求结果的行为与fetch api是保持一致的. 与 axios ofetch等其他工具不同. fetch api 将请求结果的处置权交给用户处理.
+
+如何理解这句话, 这里可以参考 axios 的 option 参数有一个名为 [responseType 的参数](https://axios-http.com/zh/docs/req_config), 可选值有: ` 'arraybuffer', 'document', 'json', 'text', 'stream', 'blob'` 表明 需要axios 对响应结果按照什么格式解析, 并作为调用函数的响应结果.  例如将传入responseType 赋值为 'blob' 
+
+```typescript
+import axios from 'axios'
+axios.post('/api/success/200',{responseType:'blob'})
+// => 响应结果将按照blob解析后并返回
+```
+
+以上调用将会返回一个blob对象
+
+到目前为止, 此结果似乎似乎没有什么不对, 也符合大部分常见需要.
+
+但是, 假设此次调用服务器方因为某种原因出现了错误. 实际返回结果是按照json返回的.
+
+那么此次调用结果仍然按照blob格式返回, 就不满足本次调用的需要了.
+
+如果你熟悉axios, 或许你会说这个问题可以在 [response hook](https://axios-http.com/zh/docs/interceptors) 中进行拦截! 可以这么做, 除非你的hook中编写了各种应对业务端的判断!
+这显然会增加hook部分的复杂度.
+
+我举以上例子是想提出 Response API. 假设对于调用时不关心最终会返回什么样的数据. 只关心此次调用是否已经达到 http 服务器并返回了响应, 而不关心数据内容是什么. 这不是调用数据时应该考虑的事情. 调用 数据 并返回数据是 http 层面应该考虑的事情, 而数据处理是业务层应该处理的事情.
+
+总结来说, fetch api 本身只关注 http 请求本身,  而不关注数据. 因此 fetch api 对于单次调用请求内容和响应结果(数据)是不关心的, 即使 404 响应, 那么此次 http 调用就是成功的! 至于响应结果为 404 , 这不是本次调用操作这个行为应该关注的事情.
+
+那么对于 fetch 来说 网络出现错误时, 即网络本身发生了错误, 或其它不可抗力无法完整完成一次请求, 比如服务器不可达, 那么调用才是是失败的.  否则只要http server响应了结果, 那么 本次请求就是完整的. 即具备返回 Response 对象的条件. 而不论 http 响应了什么内容.
+
+至此,对于 fetch api 在完整的进行了一次http 请求和响应的情况下, 将 `响应结果` 封装为了一个Response 对象.  用户此时 才应该对 响应结果关注并对结果进行处理. response 对象有一些实例方法, 可以将原始内容按照常见使用场景进行解析或格式化.
+
+由此, 基于以上 fetch api 设计原则, 对请求和处理的分离, 是编程中常见的设计与编程原则. 不论在何种规模的编码中, 此概念均能提升代码工程的质量和可维护性.
+
+ky 本质上是对 fetch api 的拓展, 故 ky 也是将响应结果按照 继承于 Promise 的 Response 对象进行返回的. 下文将使用 ky 介绍对 Response 对象进行介绍
+
+### 按照json解析
+
+例如 对 响应内容 Response 对象调用 json 方法, 就是表明将 response 按照 json 格式解析, 并返回 JavaScript 对象 
+
+```typescript
+const resp = KyInstance('success/200')
+const jsonObj = await resp.json()
+```
+
+以上调用结果 jsonObj
+```javascript
+{
+  "serach": {},
+  "body": null,
+  "message": "this is json response"
+}
+```
+
+### 按照纯文本解析
+
+例如 想对响应结果按照text解析, 将返回字符串, 可以理解为该字符串使用过 ***`*** 符号包裹过
+
+```text
+{"serach":{},"body":null,"message":"this is text response"}
+```
+
+
+### 按照 ArrayBuffer 返回
+又比如, 希望结果按照 ArrayBuffer 返回
+
+```typescript
+kyInstance.post('success/200').arrayBuffer().then(buffer => {
+  console.log('buffer', buffer);
+})
+```
+
+### 按照 ReadableStream 返回
+
+或者对响应的内容是不间断的数据流, 希望获得一个 ReadableStream, 只需要对 Response对象取值body即可
+
+```typescript
+kyInstance.post('success/200').then((resp)=>{
+  resp.body
+})
+```
+
+### 参考连接
+
+- [Response 对象](https://developer.mozilla.org/zh-CN/docs/Web/API/Response)
