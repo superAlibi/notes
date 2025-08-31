@@ -12,6 +12,7 @@ outline: [2,3]
 
 - 熟悉 [Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
 - 熟悉 [fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch): [使用fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch)
+- 熟悉 [react](https://zh-hans.react.dev/)
 - 了解 [ECMAScript 2024](https://tc39.es/ecma262/2024/)
 - 了解 [Media Source Extensions API](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)
 
@@ -212,7 +213,7 @@ function loadMp3(url?: string) {
 }
 ```
 
-### 为 sourceBuffer 写入音频数据
+### 写入音频数据
 
 ```typescript
 async function awatingSourceBuffer() {
@@ -272,5 +273,198 @@ function setupSourceBuffer(readableStream: ReadableStream) {
   });
   
   readableStream.pipeTo(writerStream);
+}
+```
+
+## 完整案例
+
+```typescript
+// readble.client.ts
+import ky from "ky";
+
+const audioContext = new AudioContext();
+export let mediaSourceManager = new MediaSource()
+
+
+
+function bindAudioEvent(audio: HTMLAudioElement) {
+  audio.addEventListener('ended', (e) => {
+    console.log('audio ended event', e)
+  })
+
+  audio.addEventListener('pause', (e) => {
+    console.log('pause event', e)
+  })
+
+  audio.addEventListener('play', (e) => {
+    console.log('play event', e)
+  })
+
+  audio.addEventListener('timeupdate', (e) => {
+    console.log('timeupdate event')
+
+  })
+}
+
+
+export let audio = new Audio()
+bindAudioEvent(audio)
+audio.src = URL.createObjectURL(mediaSourceManager)
+audio.autoplay = true
+
+
+
+const audioSouceNode = audioContext.createMediaElementSource(audio)
+
+audioSouceNode.connect(audioContext.destination)
+
+export let sourceBuffer: SourceBuffer
+
+
+mediaSourceManager.addEventListener('sourceopen', async () => {
+  console.log('mediaSourceManager 已准备好接收数据', mediaSourceManager.readyState);
+  if (sourceBuffer) { return }
+  sourceBuffer = mediaSourceManager.addSourceBuffer('audio/mpeg')
+
+})
+
+mediaSourceManager.addEventListener('sourceended', () => {
+  console.log('媒体流已结束')
+})
+
+mediaSourceManager.addEventListener('sourceclose', () => {
+  console.log('媒体流已关闭')
+})
+
+const kyInstance = ky.create({
+  prefixUrl: '/api',
+})
+async function awatingSourceBuffer() {
+  const { resolve, promise } = Promise.withResolvers<void>()
+  sourceBuffer.addEventListener('updateend', () => resolve(), { once: true })
+  return promise
+}
+let loaded = false
+function setupSourceBuffer(readableStream: ReadableStream) {
+  const writerStream = new WritableStream({
+
+    start(controller) {
+      console.log('开始接受媒体流数据');
+    },
+    async write(chunk, controller) {
+      const { resolve, reject, promise } = Promise.withResolvers<void>()
+      while (sourceBuffer.updating) {
+        // 等待更新状态稳定
+        console.log('sourceBuffer 正在更新, 等待更新完成');
+
+        await awatingSourceBuffer()
+      }
+
+      const arrayBuffer = chunk.buffer.slice(
+        chunk.byteOffset,
+        chunk.byteOffset + chunk.byteLength
+      );
+
+      try {
+        if (sourceBuffer.updating) {
+          return reject(new Error('致命错误:sourceBuffer 处于异常更新状态'))
+        }
+        sourceBuffer.appendBuffer(arrayBuffer);
+        console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
+        resolve()
+
+      } catch (error) {
+        reject(error)
+      }
+      return promise
+    },
+    async close() {
+      console.log('音频数据已接收完毕');
+      loaded = true
+      while (sourceBuffer.updating) {
+        console.log('sourceBuffer 正在更新, 等待更新完成');
+        await awatingSourceBuffer()
+      }
+      console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
+      mediaSourceManager.endOfStream();
+    },
+    abort(reason) {
+      console.log('SourceBuffer WritableStream aborted:', reason);
+    }
+  })
+  readableStream.pipeTo(writerStream)
+}
+export function loadMp3(url?: string) {
+  if (loaded) {
+    return
+  }
+  kyInstance(url ?? 'mp3/b.mp3').then(async res => {
+    if (!res.body) {
+      return
+    }
+    setupSourceBuffer(res.body)
+  })
+}
+export function play() {
+  console.log(audioContext.state);
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      console.log('audioContext resumed');
+      audio.play()
+    })
+  } else {
+    audio.play()
+  }
+
+}
+
+export function pause() {
+  audio.pause()
+  audioContext.suspend()
+}
+
+
+```
+
+```tsx
+// index.tsx
+import { Button } from "~/components/ui/button";
+import { play, pause, audio, loadMp3 } from "./readble.client";
+import { useRef, useState } from "react";
+import { useEventListener, useMount } from "@reactuses/core";
+
+export default function Readble() {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [loaded, setLoaded] = useState(false)
+  /* useMount(()=>{
+    loadMp3()
+  }) */
+  useEventListener('loadeddata', (e) => {
+    setLoaded(true)
+  }, audio)
+  return <div>
+    <audio ref={audioRef} controls>
+      <source src="/api/mp3/b.mp3" type="audio/mpeg" />
+    </audio>
+
+    <Button onClick={() => {
+      audioRef.current?.play()
+    }}>
+      播放
+    </Button>
+    <hr />
+    <div>media extends api 音频</div>
+    <Button onClick={() => {
+      loadMp3()
+    }}>
+      加载
+    </Button>
+    <Button disabled={!loaded} onClick={() => play()}>
+      播放
+    </Button>
+    <Button onClick={() => audio?.pause()}>
+      暂停
+    </Button>
+  </div>
 }
 ```
