@@ -43,13 +43,18 @@ features:
   - icon: 
       src: /blogs/ip-tcp/image.svg
     title: TCP/IP 详解 - 卷一：协议
-    details: 实体书 TCP/IP 详解 - 卷一：协议(第二版)的阅读笔记，会对内容删减不再重要的部分。因本书原版出版于 2016 年，且计算机领域发展至今已经发生了很多变化。
+    details: 实体书 TCP/IP 详解 - 卷一：协议(第二版)的阅读笔记，
     link: /blogs/comput-tcpip-protocols/index
   - icon: 
       src: /blogs/gradle.png
     title: gralde 简介
-    details: 想学习一下 Kotlin，发现可以使用 Gradle 快速启动一个 Kotlin 项目。发现其文档逻辑思路和导航非常清晰且友好
+    details: 想学习一下 Kotlin，发现可以使用 Gradle 快速启动一个 Kotlin 项目。
     link: /blogs/gradle
+  - icon: 
+      src: https://docs.gitea.cn/img/gitea.svg
+    title: gitea 二三事
+    details: 轻量化的 gite 仓库, 可以利用github的action生态. 文中介绍了部署私有化仓库到 ci/cd 的整个流程
+    link: /blogs/about-gitea
   
 ---
 
