@@ -1,3 +1,16 @@
+---
+layout: doc
+
+next:
+  text: '项目风险管理'
+  link: '/blogs/project/five'
+
+prev:
+  text: 论项目管理重要性
+  link: /link/project/three
+---
+
+
 
 # 关于项目关键路径
 关键路径（Critical Path）是项目进度管理的核心概念，指项目中从启动到收尾的最长活动序列，它决定了项目的最短完成时间。这条路径上的任何活动出现延迟，都会直接导致整个项目延期，因此被称为项目进度的“生命线”。

@@ -1,3 +1,14 @@
+---
+layout: doc
+
+next:
+  text: '项目风险管理'
+  link: '/blogs/project/four'
+
+prev:
+  text: 论项目管理重要性
+  link: /link/project/two
+---
 
 
 # 关于WBS

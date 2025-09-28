@@ -1,3 +1,12 @@
+---
+layout: doc
+
+prev:
+  text: 论项目管理重要性
+  link: /link/project/four
+---
+
+
 
 # 项目干系人
 
