@@ -2,8 +2,11 @@
 layout: doc
 
 prev:
+  text: 关于WBS
+  link: /blogs/project/about-wbs
+next:
   text: 论项目管理重要性
-  link: /link/project/four
+  link: /blogs/project/manage
 ---
 
 

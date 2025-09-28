@@ -3,11 +3,11 @@ layout: doc
 
 next:
   text: '项目风险管理'
-  link: '/blogs/project/five'
+  link: '/blogs/project/stakeholder'
 
 prev:
   text: 论项目管理重要性
-  link: /link/project/three
+  link: '/blogs/project/manage'
 ---
 
 

@@ -41,11 +41,11 @@ export default defineConfig({
         text: '项目管理',
         // collapsed: false,
         items: [
-          { text: '项目风险管理', link: '/blogs/project/two' },
-          { text: '关于WBS', link: '/blogs/project/three' },
-          { text: '项目干系人', link: '/blogs/project/five' },
-          { text: '论项目管理重要性', link: '/blogs/project/one' },
-          { text: '项目关键路径', link: '/blogs/project/four' },
+          { text: '项目风险管理', link: '/blogs/project/risk' },
+          { text: '关于WBS', link: '/blogs/project/about-wbs' },
+          { text: '项目干系人', link: '/blogs/project/stakeholder' },
+          { text: '论项目管理重要性', link: '/blogs/project/manage' },
+          { text: '项目关键路径', link: '/blogs/project/key-way' },
         ]
       }
     ],

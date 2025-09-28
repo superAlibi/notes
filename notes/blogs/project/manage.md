@@ -1,9 +1,11 @@
 ---
 layout: doc
-
+prev:
+  text: 项目干系人
+  link: '/blogs/project/stakeholder'
 next:
-  text: '项目风险管理'
-  link: '/blogs/project/two'
+  text: '项目关键路径'
+  link: '/blogs/project/key-way'
 ---
 
 # 论项目管理重要性
