@@ -26,19 +26,28 @@ export default defineConfig({
     ],
 
     socialLinks: [
-
-      // { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
       { icon: 'github', link: 'https://github.com/superAlibi' }
     ],
     sidebar: [
-      /* {
+      {
         text: '公共服务',
         link: '/public-service',
       },
       {
         text: '博客',
         link: '/blogs',
-      }, */
+      },
+      {
+        text: '项目管理',
+        // collapsed: false,
+        items: [
+          { text: '论项目管理重要性', link: '/blogs/project/one' },
+          { text: '项目风险管理', link: '/blogs/project/two' },
+          { text: '关于WBS', link: '/blogs/project/three' },
+          { text: '项目关键路径', link: '/blogs/project/four' },
+          { text: '项目干系人', link: '/blogs/project/five' },
+        ]
+      }
     ],
     outline: {
       label: '内容概要'

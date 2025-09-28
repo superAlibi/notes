@@ -12,15 +12,15 @@
     "docs:preview": "vitepress preview notes"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.1",
+    "@tailwindcss/vite": "^4.1.13",
     "@types/three": "^0.175.0",
-    "@webgpu/types": "^0.1.60",
-    "tailwindcss": "^4.1.1",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0",
-    "vitepress": "2.0.0-alpha.8"
+    "@webgpu/types": "^0.1.65",
+    "tailwindcss": "^4.1.13",
+    "typescript": "~5.7.3",
+    "vite": "npm:rolldown-vite@7.1.13",
+    "vitepress": "2.0.0-alpha.12"
   },
-  "packageManager": "pnpm@10.14.0-0+sha512.2cd47a0cbf5f1d1de7693a88307a0ede5be94e0d3b34853d800ee775efbea0650cb562b77605ec80bc8d925f5cd27c4dfe8bb04d3a0b76090784c664450d32d6",
+  "packageManager": "pnpm@10.17.1",
   "dependencies": {
     "three": "^0.175.0"
   }
