@@ -18,6 +18,13 @@ export default defineConfig({
     search: {
       provider: 'local'
     },
+    lastUpdated: {
+      text: '发布于',
+      formatOptions: {
+        dateStyle: 'full',
+        timeStyle: 'medium'
+      }
+    },
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
@@ -25,9 +32,9 @@ export default defineConfig({
       { text: '博客', link: '/blogs' },
     ],
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/superAlibi' }
-    ],
+    /* socialLinks: [
+      // { icon: 'github', link: 'https://github.com/superAlibi' }
+    ], */
     sidebar: [
       {
         text: '公共服务',

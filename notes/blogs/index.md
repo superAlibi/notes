@@ -7,11 +7,11 @@ hero:
   # image:
   #   src: /vite.svg
   #   alt: VitePress
-  actions:
+  # actions:
 
-    - theme: alt
-      text: 去github看看
-      link: https://github.com/superAlibi
+    # - theme: alt
+      # text: 去github看看
+      # link: https://github.com/superAlibi
 
 features:
   - icon: 

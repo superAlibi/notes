@@ -1,6 +1,6 @@
 ---
 layout: doc
-
+title: 关于WBS
 prev:
   text: '项目风险管理'
   link: '/blogs/project/risk'
@@ -8,6 +8,7 @@ prev:
 next:
   text: 项目干系人
   link: /blogs/project/stakeholder
+lastUpdated: 2024-9-15 15:36:21
 ---
 
 
@@ -18,5 +19,4 @@ WBS（工作分解结构）是项目管理的核心工具，通过将项目目�
 科学的WBS能明确任务边界、避免职责模糊，为进度计划、资源分配、成本估算提供依据，是连接项目目标与执行落地的桥梁，直接决定项目管理的清晰度与可控性。
 
 
-<span style="color: gray;">发布于 2024-9-15 15:36:21</span>
 
