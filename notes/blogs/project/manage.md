@@ -6,7 +6,7 @@ prev:
 next:
   text: '项目关键路径'
   link: '/blogs/project/key-way'
-lastUpdated: 2024-11-08 20:08:12
+lastUpdated: 2024-11-08T20:08:12+8:00
 ---
 
 # 论项目管理重要性

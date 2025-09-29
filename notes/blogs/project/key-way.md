@@ -8,7 +8,7 @@ next:
 prev:
   text: 论项目管理重要性
   link: '/blogs/project/manage'
-lastUpdated: 2024-12-16 21:14:21
+lastUpdated: 2024-12-16T21:14:21+08:00
 ---
 
 
