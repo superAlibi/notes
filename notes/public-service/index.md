@@ -4,17 +4,20 @@
 layout: home
 
 hero:
-  name: 公共服务
-  text: 用于提供个人案例展示
-  tagline: 家宽提供的公共服务, 仅 ipv6 网络环境可访问
+  name: 服务&案例
+  text: 
+  tagline: 仅 IPV6 网络可访问
   actions:
     - theme: brand
       text: 去博客
       link: /blogs
 
 features:
-  - title: gitea
+  - title: 代码仓库
     link: https://gitea.lucardo.website:4443
     details: gitea 仓库
+  - title: 博客案例
+    link: https://exer.lucardo.website:4443
+    details: 博客中的实际案例, 使用 react-router + SSR 技术
 
 ---

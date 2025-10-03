@@ -8,6 +8,9 @@ hero:
   tagline: 记录平时遇到的零碎问题以及最新的前端技术
   actions:
     - theme: brand
+      text: 服务&案例
+      link: /public-service
+    - theme: brand
       text: 博客
       link: /blogs
 

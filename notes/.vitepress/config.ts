@@ -19,7 +19,7 @@ export default defineConfig({
       provider: 'local'
     },
     lastUpdated: {
-      text: '发布于',
+      text: '最后更新于',
       formatOptions: {
         dateStyle: 'full',
         timeStyle: 'medium'
@@ -28,14 +28,14 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '公共服务', link: '/public-service' },
+      { text: '服务&案例', link: '/public-service' },
       { text: '博客', link: '/blogs' },
     ],
 
-    /* socialLinks: [
-      // { icon: 'github', link: 'https://github.com/superAlibi' }
-    ], */
-    sidebar: [
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/superAlibi' }
+    ],
+    /* sidebar: [
       {
         text: '公共服务',
         link: '/public-service',
@@ -43,19 +43,8 @@ export default defineConfig({
       {
         text: '博客',
         link: '/blogs',
-      },
-      {
-        text: '项目管理',
-        // collapsed: false,
-        items: [
-          { text: '项目风险管理', link: '/blogs/project/risk' },
-          { text: '关于WBS', link: '/blogs/project/about-wbs' },
-          { text: '项目干系人', link: '/blogs/project/stakeholder' },
-          { text: '论项目管理重要性', link: '/blogs/project/manage' },
-          { text: '项目关键路径', link: '/blogs/project/key-way' },
-        ]
       }
-    ],
+    ], */
     outline: {
       label: '内容概要'
     },

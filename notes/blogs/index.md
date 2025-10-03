@@ -4,14 +4,13 @@ hero:
   name: 笔记&博客
   # text: 前端,后端,数据库,操作系统
   tagline: 随便写点. 前端,后端,数据库,操作系统都有
-  # image:
-  #   src: /vite.svg
-  #   alt: VitePress
-  # actions:
-
-    # - theme: alt
-      # text: 去github看看
-      # link: https://github.com/superAlibi
+  image:
+    src: /vite.svg
+    alt: VitePress
+  actions:
+    - theme: alt
+      text: 去github看看
+      link: https://github.com/superAlibi
 
 features:
   - icon: 
