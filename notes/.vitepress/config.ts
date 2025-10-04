@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+
   lang: 'zh-CN',
   title: "云逸尘杂记",
   description: "一个前端牛马的技术碎碎念",
@@ -57,5 +59,7 @@ export default defineConfig({
     darkModeSwitchLabel: '主题切换',
     sidebarMenuLabel: '菜单',
     returnToTopLabel: '内容目录'
-  }
+  },
+  mermaid: {},
+
 })
