@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
 
@@ -60,6 +60,4 @@ export default defineConfig({
     sidebarMenuLabel: '菜单',
     returnToTopLabel: '内容目录'
   },
-  mermaid: {},
-
 })
