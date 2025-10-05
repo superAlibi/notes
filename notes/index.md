@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 服务&案例
-      link: /public-service
+      link: /service
     - theme: brand
       text: 博客
       link: /blogs

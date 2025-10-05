@@ -5,7 +5,7 @@ export default defineConfig({
 
   lang: 'zh-CN',
   title: "云逸尘杂记",
-  description: "一个前端牛马的技术碎碎念",
+  description: "一个前端牛马的碎碎念",
   vite: {
     server: {
       host: true,
@@ -30,7 +30,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '首页', link: '/' },
-      { text: '服务&案例', link: '/public-service' },
+      { text: '服务&案例', link: '/service' },
       { text: '博客', link: '/blogs' },
     ],
 
@@ -59,5 +59,5 @@ export default defineConfig({
     darkModeSwitchLabel: '主题切换',
     sidebarMenuLabel: '菜单',
     returnToTopLabel: '内容目录'
-  },
+  }
 })

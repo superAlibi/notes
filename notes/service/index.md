@@ -18,6 +18,6 @@ features:
     details: gitea 仓库
   - title: 博客案例
     link: https://exer.lucardo.website:4443
-    details: 博客中的实际案例, 使用 react-router + SSR 技术
+    details: 博客中的实际案例, 使用 react-router + SSR 技术. 重构中,暂时无法访问
 
 ---
