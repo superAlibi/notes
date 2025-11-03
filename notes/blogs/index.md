@@ -67,3 +67,7 @@ features:
 - [前端monorepo仓库](/blogs/monorepo)
 - [Stream 与 音频播放](/blogs/web_media/steam_api)
 - [Podman + Docker Registry + NPM 配置指南](/blogs/docker-registry)
+- sso 与 oauth
+- 渐进式 Web 应用(PWA)
+- 低代码/无代码浅谈
+- 个人聊天助手的设计(基于dify)
