@@ -1,8 +1,26 @@
 import { defineConfig } from 'vitepress'
+import mermaid from 'mermaid';
+
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
 
+  markdown: {
+    config: (md) => {
+
+      const defaultRender = md.renderer.rules.fence!
+      md.renderer.rules.fence = (...args) => {
+        const [tokens, idx] = args
+        const { info, content } = tokens[idx]
+        if (info.trim() === 'mermaid') {
+          // 转义反引号，避免嵌套问题
+          const code = encodeURIComponent(content.trim())
+          return `<Mermaid code="${code}" />`
+        }
+        return defaultRender(...args)
+      }
+    }
+  },
   lang: 'zh-CN',
   title: "云逸尘杂记",
   description: "一个前端牛马的碎碎念",
