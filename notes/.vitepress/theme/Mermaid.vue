@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import mermaid from 'mermaid'
-
+import { useData } from 'vitepress'
 const props = defineProps<{ code: string }>()
+const {isDark}=useData()
 
 const svg = ref<string>('')
 const id = ref<string>('')
 
 onMounted(async () => {
-  mermaid.initialize({ startOnLoad: false, theme: 'base' })
+  mermaid.initialize({ startOnLoad: false, theme: isDark.value ? "dark" : "base" })
   await render()
 })
 
