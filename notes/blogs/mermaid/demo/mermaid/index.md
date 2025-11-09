@@ -260,7 +260,6 @@ mermaid的图例有非常多, 可以参考[mermaid的简介部分内容](https:/
 
 <!-- @include: ./demo/mermaid/graph.md -->
 
-#### 流程图基本内容
 
 流程图语句块包含以下内容, `流程节点(图形)`, `关系(线段和箭头)`, `子图`
 
@@ -434,17 +433,6 @@ mermaid的图例有非常多, 可以参考[mermaid的简介部分内容](https:/
 > 更高级的语法, 包括给关系(线段)命名(标识/ID), 通过给线段命名(标识/ID)后, 将动画效果与其命名绑定, 即可实线矢量动画
 
 
-动画例子
-
-<<< ./demo/mermaid/flowchart-link-animate.md
-
-
-渲染效果
-
-<!-- @include: ./demo/mermaid/flowchart-link-animate.md -->
-
-
-如果需要自定义动画效果,可以参考[官方文档](https://mermaid.js.org/syntax/flowchart.html#selecting-type-of-animation)
 
 
 ### 时序图
