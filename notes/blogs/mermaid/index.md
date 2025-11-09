@@ -522,8 +522,89 @@ mermaid的图例有非常多, 可以参考[mermaid的简介部分内容](https:/
 
 ### 交互内容
 
+时序图中包含很多参与方的交互. 其中我挑选了部分我的文章中会涉及到的部分. 包括 `激活`,`循环`,`判断`, `可选`
 
-#### 1. 激活
-#### 2. 循环
-#### 3. 判断/分支
-#### 4. 可选
+#### 1. 激活状态
+
+<<< ./demo/mermaid/sequence-active.md
+
+<!-- @include: ./demo/mermaid/sequence-active.md -->
+
+#### 2. 笔记/提示
+
+
+最简单的例子
+
+<<< ./demo/mermaid/sequence-note.md
+
+<!-- @include: ./demo/mermaid/sequence-note.md -->
+
+或者将笔记覆盖多个参与方
+
+<<< ./demo/mermaid/sequence-note-over.md
+
+<!-- @include: ./demo/mermaid/sequence-note-over.md -->
+
+#### 3. 循环
+
+如果时序中存在循环, 可以通过`loop` 表达式完成
+
+<<< ./demo/mermaid/sequence-loop.md
+<!-- @include: ./demo/mermaid/sequence-loop.md -->
+#### 4. 判断/分支
+
+如果交互中存在根据某个状态做不同的交互, 主要语法如下
+
+<<< ./demo/mermaid/sequence-alt-syntax.md
+
+例如
+
+<<< ./demo/mermaid/sequence-alt.md
+
+<!-- @include: ./demo/mermaid/sequence-alt.md -->
+
+
+
+可选的交互
+
+<<< ./demo/mermaid/sequence-opt-syntax.md
+
+<<< ./demo/mermaid/sequence-opt-and-alt.md
+
+<!-- @include: ./demo/mermaid/sequence-opt-and-alt.md -->
+
+
+#### 5. 并行分支
+
+如果某个参与方在一段同时发起两个交互,而不管另外的参与方是否返回的交互情形, 则采用 `par and` 语句
+
+如下
+
+
+<<< ./demo/mermaid/sequence-par-syntax.md
+
+举个例子
+
+<<< ./demo/mermaid/sequence-par.md
+
+
+<!-- @include: ./demo/mermaid/sequence-par.md -->
+
+#### 6. 关键交互区域
+
+如果某个交互非常关键,希望通过圈出的区域的方式以达到着重提示的效果,则采用`critical option`语句
+
+<<< ./demo/mermaid/sequence-critical-syntax.md
+<!-- @include: ./demo/mermaid/sequence-critical.md -->
+
+
+### 交互编号
+
+可以通过给每个交互添加上标号, 让复杂的交互更加具备可读性
+
+<<< ./demo/mermaid/sequence-autonumber.md{3-4,7}
+<!-- @include: ./demo/mermaid/sequence-autonumber.md -->
+
+<!-- ### 给参与方添加点击交互 -->
+
+<!-- <<< ./demo/mermaid/sequence-menu-options.md -->
