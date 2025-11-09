@@ -518,6 +518,12 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <<< ./demo/mermaid/sequence-critical-syntax.md
 
+例子
+
+<<< ./demo/mermaid/sequence-critical.md
+
+渲染效果
+
 <!-- @include: ./demo/mermaid/sequence-critical.md -->
 
 ### 交互编号
