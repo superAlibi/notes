@@ -71,4 +71,4 @@ features:
 - 渐进式 Web 应用(PWA)
 - 低代码/无代码浅谈
 - 个人聊天助手的设计(基于dify)
-- [mermaid](/blogs/mermaid)
+- [使用mermaid画流程图](/blogs/mermaid/index)
