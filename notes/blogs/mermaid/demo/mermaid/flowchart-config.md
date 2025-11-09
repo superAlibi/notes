@@ -1,0 +1,13 @@
+```mermaid
+---
+title: 图例标题配置
+config:
+  look: handDrawn
+
+---
+flowchart LR
+    start[开始] --> I{判断些什么}
+    I ---|满足|做些什么
+    I ---|不满足|做些其他
+    做些什么 & 做些其他 --> 结束((结束))
+```
