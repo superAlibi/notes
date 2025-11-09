@@ -37,6 +37,11 @@ outline: [2,4]
 - [USTC Markdown 使用教程](https://soc.ustc.edu.cn/Digital/2025/lab0/markdown/)
 - [Mermaid 官方文档](https://mermaid.js.org/)
 
+
+## 目录
+
+[[toc]]
+
 ## 基本语法 {#base-syntax}
 
 此部分介绍一个 Mermaid 语法（代码）应该包含哪些结构。为后续在编写 Mermaid 语法（代码）的时候，对整体有个了解，而不是只知道怎么出图。
@@ -398,7 +403,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-actor.md -->
 
-### 交互方类型
+#### 一. 交互方类型
 
 交互方类型只有两种：`actor` 和 `participant`。但是还有个不知道从什么版本引入的特性，通过 `@` 语法可以为普通参与方类型制定不一样的图标。
 
@@ -419,7 +424,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 | `collections` | 收藏/收集 |
 | `queue`       | 队列      |
 
-### 参与方别名
+#### 二. 参与方别名
 
 当参与方过多时，不想写参与方过长的名字，还可以为参与方设置一个别名（标记/ID/标识）。
 
@@ -429,7 +434,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-tag.md -->
 
-### 箭头
+#### 三. 箭头类型
 
 交互方向包含如下类型：
 
@@ -446,17 +451,17 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 | `-)`     | 末端有开箭头的实线 (async)   |
 | `--)`    | 末端有开箭头的点状线 (async) |
 
-### 交互内容
+#### 四. 交互内容
 
 时序图中包含很多参与方的交互。其中我挑选了部分我的文章中会涉及到的部分，包括 `激活`、`循环`、`判断`、`可选`。
 
-#### 1. 激活状态
+##### 1. 激活状态
 
 <<< ./demo/mermaid/sequence-active.md
 
 <!-- @include: ./demo/mermaid/sequence-active.md -->
 
-#### 2. 笔记/提示
+##### 2. 笔记/提示
 
 最简单的例子：
 
@@ -470,7 +475,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-note-over.md -->
 
-#### 3. 循环
+##### 3. 循环
 
 如果时序中存在循环，可以通过 `loop` 表达式完成：
 
@@ -478,7 +483,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-loop.md -->
 
-#### 4. 判断/分支
+##### 4. 判断/分支
 
 如果交互中存在根据某个状态做不同的交互，主要语法如下：
 
@@ -498,7 +503,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-opt-and-alt.md -->
 
-#### 5. 并行分支
+##### 5. 并行分支
 
 如果某个参与方在一段同时发起两个交互，而不管另外的参与方是否返回的交互情形，则采用 `par and` 语句。
 
@@ -512,7 +517,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-par.md -->
 
-#### 6. 关键交互区域
+##### 6. 关键交互区域
 
 如果某个交互非常关键，希望通过圈出的区域的方式以达到着重提示的效果，则采用 `critical option` 语句。
 
@@ -526,7 +531,7 @@ Mermaid 的图例有非常多，可以参考 [Mermaid 的简介部分内容](htt
 
 <!-- @include: ./demo/mermaid/sequence-critical.md -->
 
-### 交互编号
+#### 五. 交互编号
 
 可以通过给每个交互添加上标号，让复杂的交互更加具备可读性。
 
