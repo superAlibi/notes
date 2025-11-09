@@ -14,6 +14,11 @@ hero:
 
 features:
   - icon: 
+      src: https://mermaid.js.org/favicon.svg
+    title: 用mermaid画出精美的流程图
+    details: 想象一下一个厚厚的文档没有一点图例, 那本书该有多无聊呢? 一图胜千言
+    link: /blogs/mermaid/index
+  - icon: 
       src: https://www.postgresql.org/media/img/about/press/elephant.png
     title: 在Linux上安装postgresql
     details: 它比mysql更符合ANSI SQL,因为其强大和灵活的配置和插件系统,导致其配置文件相当复杂.默认配置非常安全!
