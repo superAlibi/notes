@@ -8,7 +8,8 @@ outline:
 
 Rust 提供了 Cargo 这样的二进制安装工具，可以使用 Cargo 安装 Deno。
 
-> **注意**：这不是唯一的安装方式，仅代表其中一种方式。另有其他[官方推荐的安装方式](https://docs.deno.com/runtime/getting_started/installation/#download-and-install)。通过此种方式安装，在新机器上可能存在问题，需要通过搜索引擎解决。
+> [!NOTE]
+> 这不是唯一的安装方式，仅代表其中一种方式。另有其他[官方推荐的安装方式](https://docs.deno.com/runtime/getting_started/installation/#download-and-install)。通过此种方式安装，在新机器上可能存在问题，需要通过搜索引擎解决。
 
 ## 前言
 
@@ -20,7 +21,7 @@ Rust 提供了 Cargo 这样的二进制安装工具，可以使用 Cargo 安装 
 - 系统为 Linux
 - 了解并理解 [Deno](https://deno.com/)
 
-### 在没有科学上网环境时
+### 没有访问国外网络的网络环境 ?
 
 - 在 Rustup 安装工具链时，可以参考[清华大学的镜像源文档](https://mirrors.tuna.tsinghua.edu.cn/help/rustup/)，或[中国科学技术大学镜像文档](https://mirrors.ustc.edu.cn/help/rust-static.html)
 - 在 Cargo 安装 Deno 时，可以参考[清华大学的镜像源文档](https://mirrors.tuna.tsinghua.edu.cn/help/crates.io-index.git/)，或[中国科学技术大学镜像文档](https://mirrors.ustc.edu.cn/help/crates.io-index.html)

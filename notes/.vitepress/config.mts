@@ -6,6 +6,14 @@ import mermaid from 'mermaid';
 export default defineConfig({
 
   markdown: {
+    container: {
+      noteLabel: '注意',
+      tipLabel: '提示',
+      warningLabel: '警告',
+      dangerLabel: '危险',
+      infoLabel: '信息',
+      detailsLabel: '详细信息'
+    },
     config: (md) => {
 
       const defaultRender = md.renderer.rules.fence!
