@@ -20,6 +20,7 @@ outline: [2,3]
 
 - [浅谈 audioContext 音频上下文 - CSDN](https://blog.csdn.net/2301_79280768/article/details/146991572)
 - [AudioContext 入门 - 稀土掘金](https://juejin.cn/post/6962380242497306638)
+- [流式音频播放](https://juejin.cn/post/7500121659090321442)
 
 **写作动机**
 
@@ -37,9 +38,177 @@ Web 媒体技术涉及诸多概念，本文主旨在于介绍以下场景：
 
 本文案例也可用于网络情况不佳但又需要及时播放的场景。同理，也适用于网络情况良好但带宽不够时，实现加载高负载的播放内容，减轻客户端加载压力。
 
-## 音频播放相关概念
 
-了解关键概念有助于回顾和理解本文代码逻辑。
+
+## 技术运用级别
+
+
+
+本质上, 使用到媒体播放一般有两类技术级别.
+
+1. 单纯用于播放音频
+2. 对音频进行处理和分析
+
+第一类用于 `单纯音频播放`, 例如可能从某个静态文件地址, 或者从通过某个接口返回的音频数据流播放音频.
+第二类则是 `更高级的需求`, 例如: 调整音频效果, 或者为了分析音频音谱, 而是否播放音频则可能是次要的.
+
+对于本文的初版, 仅为处理 `dify` 的语音合成播放而写的. 后来, 经过详细了解后, 发现初版仅仅为了播放远程数据, 根本就不需要用到AudioContext, 因为该对象是为了处理更高级的需求.
+
+由此, 本文在 `2025年11月22日` 进行了调整:
+
+- 增加 `MSE API` 播放与案例
+- 调整 `AudioContext` 案例
+- 增加外部资料连接
+
+下文, 我将介绍两类需求级别
+
+## 单纯播放音频
+
+对于简单播放需求的情况, 也分两类播放源, 第一种是已经存在一个静态地址, 可以获得媒体源. 对于此类情况, 只需要使用`<audio/>`即可满足需要
+
+例如
+
+```html
+<audio controls>
+  <source src="file.mp3" type="audio/mpeg" />
+</audio>
+```
+
+**通过异步请求mp3**则不同, 此种情况用于请求音频流时, 发起方需要携带一大堆数据的情况. 通过异步请求返回的音频数据流作为音频原, 进行播放.
+
+> [!WARNING]
+> 采用异步加载的方法, 不被firefox所支持, 原因在于 MSE 不支持纯 MP3，因为 MP3 不是分段媒体格式。
+> 因此,在在firefox这样相对来说更加注重标准本身的浏览器上无法正常使用!
+> 但是能在 基于 chrome 内核的浏览器上使用
+> 如果想要使用 MSE 播放, 推荐将mp3格式封装在mp4容器中, 或者将mp3文件格式化为acc格式(`m4a.40.2`)
+
+```mermaid
+graph LR
+  Audio[new Audio]-- audioObj --> out
+  s[new MediaSource]-- mediaSouceObj -->URL[URL.createObjectURL]
+  URL-- urlObj --> out(("audioObj.src=urlObj"))
+```
+
+基本流程如上所示, 需要着重关注的对象应该是MediaSouce, 因为创建后, 还需要将异步请求的媒体源对接到该对象之上.
+
+但是在对接前, 需要等待MediaSouce准备完毕才行. 通过监听MediaSouce触发的souceopen事件, 则表示mediaSouce已经准备好接受 异步数据流了
+
+```typescript
+// 音频流缓冲对象
+let sourceBuffer: SourceBuffer | undefined
+
+medisSouce.addEventListener('sourceopen', async () => {
+  console.log('mediaSourceManager 已准备好接收数据', mediaSourceManager.readyState);
+  if (sourceBuffer) { return }
+
+  if (MediaSource.isTypeSupported('audio/mpeg')) {
+    sourceBuffer = medisSouce.addSourceBuffer('audio/mpeg')
+    // 在这里为SouceBuffer添加数据流
+  } else {
+    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
+  }
+})
+```
+此处引入了一个新的概念,称为 SouceBuffer, 一个mediaSouce是可以添加多个缓冲区的. 相当于可以存在数个缓冲.
+
+根本上, 通过异步数据返回的流, 是添加在缓冲区对象中的. 通过缓冲对象与 mediaSouce, 实现数据流传输到 audio 中进行播放.
+
+接下来, 通过ui操作实现对SouceBuffer添加音频数据流.
+
+```tsx
+<Button onClick={() => {
+  loadMp3()
+}}>
+  加载
+</Button>
+<Button disabled={!loaded} onClick={() => play()}>
+  播放
+</Button>
+<Button onClick={() => audio?.pause()}>
+  暂停
+</Button>
+```
+```typescript
+/**
+ * 通过promise实现等待缓冲更新完成事件
+ */
+async function awatingSourceBuffer() {
+  const { resolve, promise } = Promise.withResolvers<void>()
+  sourceBuffer?.addEventListener('updateend', () => resolve(), { once: true })
+  return promise
+}
+function loadMp3(url?: string) {
+  if (loaded) {
+    return
+  }
+  fetch(url ?? '/assets/a.mp3',).then(async res => {
+    if (!res.body) {
+      return
+    }
+     const writerStream = new WritableStream({
+
+      start(controller) {
+        console.log('开始接受媒体流数据');
+      },
+      async write(chunk, controller) {
+       while (sourceBuffer?.updating) {
+          // 等待更新状态稳定
+          console.log('sourceBuffer 正在更新, 等待更新完成');
+
+          await awatingSourceBuffer()
+        }
+
+        const arrayBuffer = chunk.buffer
+
+        console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态')
+
+        sourceBuffer?.appendBuffer(arrayBuffer);
+        console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
+
+      },
+      async close() {
+        console.log('音频数据已接收完毕');
+        loaded = true
+        while (sourceBuffer?.updating) {
+          console.log('sourceBuffer 正在更新, 等待更新完成');
+          await awatingSourceBuffer()
+        }
+        console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
+        mediaSourceManager.endOfStream();
+      },
+      abort(reason) {
+        console.log('SourceBuffer WritableStream aborted:', reason);
+      }
+    })
+    res.body.pipeTo(writerStream)
+  })
+}
+```
+
+```mermaid
+graph TB
+  Audio[new Audio]-.- audioObj -.-> out
+  Audio==>s
+  s[new MediaSource]==>|mediaSouceObj|URL[URL.createObjectURL]
+  s-.->|on sourceopen tigger|support
+  URL==>|urlObj| out(("audioObj.src=urlObj"))
+  subgraph 异步处理子程序
+    support{"是否支持mp3格式"} -- true --> createBuffer["创建缓冲对象"]
+    createBuffer-.->|souceBufferObj|pushBuffer
+    createBuffer-->fetchStream[拉取媒体流]
+    fetchStream-->|stream buffer data|pushBuffer[向缓冲对象添加音频数据]
+    support -- false --> Error["throw Error()"]
+    
+  end
+  pushBuffer stream@==>|media stream|s
+  stream@{ animate: true }
+```
+
+
+
+## 更高级需求
+
+
 
 ### AudioContext
 
@@ -68,6 +237,9 @@ MediaSource 正是为了通过 JavaScript 创建媒体串流而设计的。
 该对象继承于 AudioNode，但着重于描述一个 AudioContext 音频处理的出口，即对音频进行最后播放（最后一个处理节点），播放后就是耳朵听到的声音，程序再无后续处理。
 
 默认情况下，AudioContext 实例有一个 `destination` 属性，就是该对象。
+
+
+### 处理流程图
 
 ### ReadableStream
 
