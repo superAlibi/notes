@@ -14,10 +14,15 @@ hero:
 
 features:
   - icon: 
-      src: https://mermaid.js.org/favicon.svg
+      src: /blogs/mermaid/icon.svg
     title: 用mermaid画出精美的流程图
     details: 想象一下一个厚厚的文档没有一点图例, 那本书该有多无聊呢? 一图胜千言
     link: /blogs/mermaid/index
+  - icon: 
+      src: /blogs/mse/icon.png
+    title: MSE API 与 音频播放
+    details: 媒体流处理与 mse 使用方法 及其简单案例
+    link: /blogs/web_media/audio_api
   - icon: 
       src: /blogs/pg/icon.png
     title: 在Linux上安装postgresql
@@ -68,9 +73,9 @@ features:
 - [关于print css](/blogs/about-print-css)
 - [TCP/IP 详解 - 卷一：协议](/blogs/comput-tcpip-protocols/index)
 - [前端monorepo仓库](/blogs/monorepo)
-- [MSE API 与 音频播放](/blogs/web_media/audio_api)
 - [Podman + Docker Registry + NPM 配置指南](/blogs/docker-registry)
 - sso 与 oauth
 - 渐进式 Web 应用(PWA)
 - 低代码/无代码浅谈
 - 个人聊天助手的设计(基于dify)
+- web可访问性与渐进式体验概述
