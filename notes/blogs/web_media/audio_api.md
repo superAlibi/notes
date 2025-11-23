@@ -545,110 +545,127 @@ function loadMp3(url?: string) {
 
 ```typescript
 // audiocontext.client.ts
-import mime from 'mime';
+import mime from 'mime'
 
 const audioContext = new AudioContext();
-export let mediaSource = new MediaSource();
+export let mediaSource = new MediaSource()
 
-export const audio = new Audio();
-audio.src = URL.createObjectURL(mediaSource);
 
-const audioSourceNode = audioContext.createMediaElementSource(audio);
-audioSourceNode.connect(audioContext.destination);
 
-export let sourceBuffer: SourceBuffer | undefined;
+export const audio = new Audio()
+audio.src = URL.createObjectURL(mediaSource)
+
+
+
+const audioSouceNode = audioContext.createMediaElementSource(audio)
+
+audioSouceNode.connect(audioContext.destination)
+
+export let sourceBuffer: SourceBuffer | undefined
+
 
 mediaSource.addEventListener('sourceopen', async () => {
   console.log('mediaSource 已准备好接收数据', mediaSource.readyState);
-  if (sourceBuffer) { return; }
+  if (sourceBuffer) { return }
 
-  const mp3format = mime.getType('.mp3')!;
+  const mp3format = mime.getType('.mp3')!
+
   if (MediaSource.isTypeSupported(mp3format)) {
-    sourceBuffer = mediaSource.addSourceBuffer(mp3format);
+    sourceBuffer = mediaSource.addSourceBuffer(mp3format)
   } else {
-    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。');
+    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
   }
-});
+})
 
 mediaSource.addEventListener('sourceended', () => {
-  console.log('媒体流已结束');
-});
+  console.log('媒体流已结束')
+})
 
 mediaSource.addEventListener('sourceclose', () => {
-  console.log('媒体流已关闭');
-});
+  console.log('媒体流已关闭')
+})
+
 
 async function awatingSourceBuffer() {
-  const { resolve, promise } = Promise.withResolvers<void>();
-  sourceBuffer?.addEventListener('updateend', () => resolve(), { once: true });
-  return promise;
+  const { resolve, promise } = Promise.withResolvers<void>()
+  sourceBuffer?.addEventListener('updateend', () => resolve(), { once: true })
+  return promise
 }
-
-let loaded = false;
+let loaded = false
 
 export function loadMp3(url?: string) {
   if (loaded) {
-    return;
+    return
   }
-  fetch(url ?? '/assets/a.mp3')
+  fetch(url ?? '/assets/b.mp3',)
     .then(async res => {
       if (!res.body) {
-        return;
+        return
       }
 
       const writerStream = new WritableStream({
+
         start(controller) {
           console.log('开始接受媒体流数据');
         },
         async write(chunk, controller) {
           while (sourceBuffer?.updating) {
             // 等待更新状态稳定
-            console.log('sourceBuffer 正在更新，等待更新完成');
-            await awatingSourceBuffer();
+            console.log('sourceBuffer 正在更新, 等待更新完成');
+
+            await awatingSourceBuffer()
           }
 
-          const arrayBuffer = chunk.buffer;
-          console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态');
+          const arrayBuffer = chunk.buffer
+          console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态')
+
           sourceBuffer?.appendBuffer(arrayBuffer);
-          console.log('写入 sourceBuffer 完成，写入大小:', arrayBuffer.byteLength);
+          console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
+
+
         },
         async close() {
           console.log('音频数据已接收完毕');
           while (sourceBuffer?.updating) {
-            console.log('sourceBuffer 正在更新，等待更新完成');
-            await awatingSourceBuffer();
+            console.log('sourceBuffer 正在更新, 等待更新完成');
+            await awatingSourceBuffer()
           }
-          console.log('结束数据流，将数据流写入 sourceBuffer 完成，开始 endOfStream');
+          console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
           mediaSource.endOfStream();
-          loaded = true;
+          loaded = true
         },
         abort(reason) {
           console.log('SourceBuffer WritableStream aborted:', reason);
+          mediaSource.endOfStream()
         }
-      });
-      res.body.pipeTo(writerStream);
-    });
-}
+      })
+      res.body.pipeTo(writerStream)
 
-export function play() {
-  console.log(audioContext.state);
+    })
+}
+export function playOrResume() {
   switch (audioContext.state) {
     case 'suspended':
-      audioContext.resume().then(() => {
-        audio.play();
-      });
-      break;
+      audioContext.resume()
+        .then(() => {
+          audio.play()
+        })
+      break
     case 'running':
-      audio.play();
+      audioContext.suspend()
+        .then(() => {
+          audio.pause()
+        })
+      break
+    case 'closed':
+      audioContext.resume()
+        .then(() => {
+          audio.play()
+        })
+      break
   }
 }
 
-export function pause() {
-  audioContext.suspend()
-    .then(() => {
-      audio.pause();
-    });
-}
 ```
 
 ### **UI 部分**
@@ -656,97 +673,79 @@ export function pause() {
 ```tsx
 // index.tsx
 import { Button } from "~/components/ui/button";
-import { audio, loadMp3 } from "./mse.client";
+import { audio, loadMp3, playOrResume } from "./audiocontext.client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useEventListener } from "usehooks-ts";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import { useEventListener, } from "usehooks-ts";
 import { HardDriveDownload, Loader2, Pause, Play, RotateCcw } from "lucide-react";
-
-export default function Readable() {
+export function AudioContextPlayer() {
   /**
-   * Media Source Extensions API
+   * media source extension api
    */
-  const audioRefInstance = useRef(audio);
-  const [loading, setLoading] = useState(false);
+  const audioRefInstance = useRef(audio)
+  const [loading, setLoading] = useState(false)
   /**
    * 是否已经准备好播放第一帧数据
    */
-  const [loaded, setLoaded] = useState(false);
-  const [loadedCount, setLoadedCount] = useState(0);
-
+  const [loaded, setLoaded] = useState(false)
+  const [loadedCount, setLoadedCount] = useState(0)
   const startLoading = useCallback(() => {
-    setLoading(true);
-    loadMp3();
-  }, []);
-
+      setLoading(true)
+      loadMp3()
+  }, [])
   useEffect(() => {
-    setLoadedCount(audio.currentTime);
-    setLoaded(audio.readyState === 4 && audio.buffered.length > 0);
-  }, []);
-
+      setLoadedCount(audio.currentTime)
+      setLoaded(audio.readyState === 4 && audio.buffered.length > 0)
+  }, [])
   useEventListener('timeupdate', (e) => {
-    setLoadedCount(audio.currentTime);
-  }, audioRefInstance);
-
+      setLoadedCount(audio.currentTime)
+  }, audioRefInstance)
   /**
    * 是否已经暂停
    */
-  const [paused, setPaused] = useState(true);
+  const [paused, setPaused] = useState(true)
   useEffect(() => {
-    setPaused(audio.paused);
-  }, []);
+      setPaused(audio.paused)
+  }, [])
 
   useEventListener('loadeddata', (e) => {
-    setLoaded(true);
-    setLoading(false);
-    audioRefInstance.current.play();
-  }, audioRefInstance);
-
+      setLoaded(true)
+      setLoading(false)
+      playOrResume()
+  }, audioRefInstance)
   useEventListener('play', (e) => {
-    setPaused(false);
-  }, audioRefInstance);
-
+      setPaused(false)
+  }, audioRefInstance)
   useEventListener('pause', (e) => {
-    setPaused(true);
-  }, audioRefInstance);
+      setPaused(true)
+  }, audioRefInstance)
+
 
   const useControlAudio = useMemo(() => {
-    if (!loaded) {
-      return null;
-    }
-
-    if (paused) {
-      return (
-        <Button onClick={() => audioRefInstance.current.play()}>
-          <Play />
-          播放
-        </Button>
-      );
-    }
-
-    return (
-      <Button onClick={() => audioRefInstance.current.pause()}>
-        <Pause />
-        暂停
+      if (!loaded) {
+          return null
+      }
+      if (paused) {
+          return <Button onClick={() => playOrResume()}>
+              <Play />
+              播放
+          </Button>
+      }
+      return <Button onClick={() => playOrResume()}>
+          <Pause />
+          暂停
       </Button>
-    );
-  }, [loaded, paused]);
-
-  return (
-    <div>
-      {!loaded && (
-        <Button disabled={loading} onClick={startLoading}>
+  }, [loaded, paused])
+  return <>
+      {!loaded && <Button disabled={loading} onClick={startLoading}>
           {loading ? <Loader2 className="size-4 animate-spin" /> : <HardDriveDownload />}
           加载并播放
-        </Button>
-      )}
-      {useControlAudio}
-      {loaded && (
-        <Button className="select-none" disabled={!loadedCount} onClick={() => audioRefInstance.current.currentTime = 0}>
+      </Button>}
+      {
+          useControlAudio
+      }
+      {loaded && <Button className="select-none" disabled={!loadedCount} onClick={() => audioRefInstance.current.currentTime = 0}>
           <RotateCcw />重新播放
-        </Button>
-      )}
-    </div>
-  );
+      </Button>}
+  </>
 }
 ```
