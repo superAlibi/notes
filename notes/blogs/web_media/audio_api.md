@@ -1,5 +1,5 @@
 ---
-outline: [2,3]
+outline: [2, 4]
 ---
 
 # Stream 与音频播放技术
@@ -10,49 +10,58 @@ outline: [2,3]
 
 想要流畅阅读本文，需要读者具备以下知识储备：
 
-- 熟悉 [Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
-- 熟悉 [fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch): [使用fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch)
-- 熟悉 [react](https://zh-hans.react.dev/)
+- 熟悉
+  [Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
+- 熟悉
+  [fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch)
 - 了解 [ECMAScript 2024](https://tc39.es/ecma262/2024/)
-- 了解 [Media Source Extensions API](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)
+- 了解 对象继承概念
+- 了解
+  [Media Source Extensions API](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)
 
 **参考链接**
 
+- [Media Source Extensions API - MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)
+- [Web Audio API - MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Audio_API)
 - [浅谈 audioContext 音频上下文 - CSDN](https://blog.csdn.net/2301_79280768/article/details/146991572)
 - [AudioContext 入门 - 稀土掘金](https://juejin.cn/post/6962380242497306638)
-- [流式音频播放](https://juejin.cn/post/7500121659090321442)
+- [流式音频播放 - 稀土掘金](https://juejin.cn/post/7500121659090321442)
 
 **写作动机**
 
-工作中遇到了类似功能逻辑，初次看到时，就觉得其代码不够优雅，主要体现在没有充分运用 Stream 数据流背压技术。
+工作中遇到了类似功能逻辑，初次看到时，就觉得其代码不够优雅，主要体现在没有充分运用
+Stream 数据流背压技术。
 
-除此之外，我对 [Web 媒体技术](https://developer.mozilla.org/zh-CN/docs/Web/Media) 本身也具有很高的学习热情。因为现代媒体技术已不同于以往使用 Flash 技术的时代，现在相关工作组已经将技术规范标准化。
+除此之外，我对
+[Web 媒体技术](https://developer.mozilla.org/zh-CN/docs/Web/Media)
+本身也具有很高的学习热情。因为现代媒体技术已不同于以往使用 Flash
+技术的时代，现在相关工作组已经将技术规范标准化。
 
 国内由于各种原因并未采用相关标准实现在线直播或语音聊天，这让我感觉很失落。最近两天花了点时间学习了相关概念，虽然仅限皮毛且仅限于音频技术，但已足以应付工作中的相关问题，更重要的是通过写作记录加深印象。
 
 Web 媒体技术涉及诸多概念，本文主旨在于介绍以下场景：
 
-当播放源不能通过地址简单获取数据流时的情况。例如，需要在请求头中加上 Authorization 请求头，且不知道音频长度时，实现一边播放一边拉取音频数据。
+当播放源不能通过地址简单获取数据流时的情况。例如，需要在请求头中加上
+Authorization 请求头，且不知道音频长度时，实现一边播放一边拉取音频数据。
 
 此类情况适用于需要权限查看的音频或来自服务器的合成音频。对于一开始就已知音频长度、可以一次性将数据流拉取完再播放的情况，不适用于本文。
 
 本文案例也可用于网络情况不佳但又需要及时播放的场景。同理，也适用于网络情况良好但带宽不够时，实现加载高负载的播放内容，减轻客户端加载压力。
 
-
-
-## 技术运用级别
-
-
+## 一. 技术需求级别
 
 本质上, 使用到媒体播放一般有两类技术级别.
 
 1. 单纯用于播放音频
-2. 对音频进行处理和分析
+2. 对音频增幅处理和分析
 
-第一类用于 `单纯音频播放`, 例如可能从某个静态文件地址, 或者从通过某个接口返回的音频数据流播放音频.
-第二类则是 `更高级的需求`, 例如: 调整音频效果, 或者为了分析音频音谱, 而是否播放音频则可能是次要的.
+第一类用于 `单纯音频播放`, 例如可能从某个静态文件地址,
+或者从通过某个接口返回的音频数据流播放音频. 第二类则是 `更高级的需求`, 例如:
+调整音频效果, 或者为了分析音频音谱, 而是否播放音频则可能是次要的.
 
-对于本文的初版, 仅为处理 `dify` 的语音合成播放而写的. 后来, 经过详细了解后, 发现初版仅仅为了播放远程数据, 根本就不需要用到AudioContext, 因为该对象是为了处理更高级的需求.
+对于本文的初版, 仅为处理 `dify` 的语音合成播放而写的. 后来, 经过详细了解后,
+发现初版仅仅为了播放远程数据, 根本就不需要用到AudioContext,
+因为该对象是为了处理更高级的需求.
 
 由此, 本文在 `2025年11月22日` 进行了调整:
 
@@ -62,58 +71,98 @@ Web 媒体技术涉及诸多概念，本文主旨在于介绍以下场景：
 
 下文, 我将介绍两类需求级别
 
-## 单纯播放音频
+## 二. 简单播放音频
 
-对于简单播放需求的情况, 也分两类播放源, 第一种是已经存在一个静态地址, 可以获得媒体源. 对于此类情况, 只需要使用`<audio/>`即可满足需要
+对于简单播放需求的情况, 也分两类播放源, 第一种是已经存在一个静态地址,
+可以获得媒体源. 对于此类情况, 只需要使用`<audio/>`即可满足需要
+
+### html标签播放
+
+最简单的音频播放采用如下标签格式即可.
 
 例如
 
 ```html
 <audio controls>
-  <source src="file.mp3" type="audio/mpeg" />
+  <source src="file.mp3" />
 </audio>
 ```
 
-**通过异步请求mp3**则不同, 此种情况用于请求音频流时, 发起方需要携带一大堆数据的情况. 通过异步请求返回的音频数据流作为音频原, 进行播放.
+### 异步请求音频数据
+
+**通过异步请求mp3**则不同, 此种情况用于请求音频流时,
+发起方需要携带一大堆数据的情况. 通过异步请求返回的音频数据流作为音频原,
+进行播放.
 
 > [!WARNING]
-> 采用异步加载的方法, 不被firefox所支持, 原因在于 MSE 不支持纯 MP3，因为 MP3 不是分段媒体格式。
-> 因此,在在firefox这样相对来说更加注重标准本身的浏览器上无法正常使用!
-> 但是能在 基于 chrome 内核的浏览器上使用
-> 如果想要使用 MSE 播放, 推荐将mp3格式封装在mp4容器中, 或者将mp3文件格式化为acc格式(`m4a.40.2`)
+> 采用异步加载的方法, 不被firefox所支持, 原因在于 MSE 不支持纯 MP3，因为 MP3
+> 不是分段媒体格式。
+> 因此,在在firefox这样相对来说更加注重标准本身的浏览器上无法正常使用! 但是能在
+> 基于 chrome 内核的浏览器上使用 如果想要使用 MSE 播放,
+> 推荐将mp3格式封装在mp4容器中, 或者将mp3文件格式化为acc格式(`m4a.40.2`)
+
+#### 1. 基本流程
 
 ```mermaid
-graph LR
+---
+title: 异步音频播放概览
+---
+graph TB
   Audio[new Audio]-- audioObj --> out
   s[new MediaSource]-- mediaSouceObj -->URL[URL.createObjectURL]
   URL-- urlObj --> out(("audioObj.src=urlObj"))
 ```
 
-基本流程如上所示, 需要着重关注的对象应该是MediaSouce, 因为创建后, 还需要将异步请求的媒体源对接到该对象之上.
+基本流程如上所示, 需要着重关注的对象应该是MediaSouce,
+因为mediasouce才是音频数据的源头.
 
-但是在对接前, 需要等待MediaSouce准备完毕才行. 通过监听MediaSouce触发的souceopen事件, 则表示mediaSouce已经准备好接受 异步数据流了
+```typescript
+const mediaSource = new MediaSource();
+const audio = new Audio();
+audio.src = URL.createObjectURL(mediaSource);
+```
+
+#### 2. 等待 mediasouce
+
+在为源头添加数据前, 需要等待 `MediaSouce` 准备完毕才行.
+通过MediaSouce触发的souceopen事件, 便能知晓 mediasouce 已经准备完毕.
 
 ```typescript
 // 音频流缓冲对象
-let sourceBuffer: SourceBuffer | undefined
+let sourceBuffer: SourceBuffer | undefined;
 
-medisSouce.addEventListener('sourceopen', async () => {
-  console.log('mediaSourceManager 已准备好接收数据', mediaSourceManager.readyState);
-  if (sourceBuffer) { return }
+medisSouce.addEventListener("sourceopen", async () => {
+  console.log(
+    "mediaSourceManager 已准备好接收数据",
+    mediaSourceManager.readyState,
+  );
+  if (sourceBuffer) return;
 
-  if (MediaSource.isTypeSupported('audio/mpeg')) {
-    sourceBuffer = medisSouce.addSourceBuffer('audio/mpeg')
+  if (MediaSource.isTypeSupported("audio/mpeg")) {
+    sourceBuffer = medisSouce.addSourceBuffer("audio/mpeg");
     // 在这里为SouceBuffer添加数据流
   } else {
-    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
+    throw new Error(
+      "浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。",
+    );
   }
-})
+});
 ```
-此处引入了一个新的概念,称为 SouceBuffer, 一个mediaSouce是可以添加多个缓冲区的. 相当于可以存在数个缓冲.
 
-根本上, 通过异步数据返回的流, 是添加在缓冲区对象中的. 通过缓冲对象与 mediaSouce, 实现数据流传输到 audio 中进行播放.
+此处引入了一个新的概念,称为 SouceBuffer, 一个mediaSouce是可以添加多个缓冲区的.
+相当于可以存在数个缓冲.
+
+根本上, 通过异步数据返回的流, 是添加在缓冲区对象中的. 通过缓冲对象与 mediaSouce,
+实现数据流传输到 audio 中进行播放.
 
 接下来, 通过ui操作实现对SouceBuffer添加音频数据流.
+
+#### 3. 拉取并填充数据
+
+以下代码由 react 编写的ui, 具体语法此处不介绍.
+
+主要描述了, 加载按钮, 播放操作和暂停播放. 具体函数内容将在后文介绍.
+此处作为上下文补充内容
 
 ```tsx
 <Button onClick={() => {
@@ -121,71 +170,80 @@ medisSouce.addEventListener('sourceopen', async () => {
 }}>
   加载
 </Button>
-<Button disabled={!loaded} onClick={() => play()}>
+<Button disabled={!loaded} onClick={() => audio.play()}>
   播放
 </Button>
 <Button onClick={() => audio?.pause()}>
   暂停
 </Button>
 ```
+
+主要加载逻辑部分
+
 ```typescript
 /**
  * 通过promise实现等待缓冲更新完成事件
  */
 async function awatingSourceBuffer() {
-  const { resolve, promise } = Promise.withResolvers<void>()
-  sourceBuffer?.addEventListener('updateend', () => resolve(), { once: true })
-  return promise
+  const { resolve, promise } = Promise.withResolvers<void>();
+  sourceBuffer?.addEventListener("updateend", () => resolve(), { once: true });
+  return promise;
 }
 function loadMp3(url?: string) {
   if (loaded) {
-    return
+    return;
   }
-  fetch(url ?? '/assets/a.mp3',).then(async res => {
+  fetch(url ?? "/assets/b.mp3").then(async (res) => {
     if (!res.body) {
-      return
+      return;
     }
-     const writerStream = new WritableStream({
-
+    const writerStream = new WritableStream({
       start(controller) {
-        console.log('开始接受媒体流数据');
+        console.log("开始接受媒体流数据");
       },
       async write(chunk, controller) {
-       while (sourceBuffer?.updating) {
+        while (sourceBuffer?.updating) {
           // 等待更新状态稳定
-          console.log('sourceBuffer 正在更新, 等待更新完成');
+          console.log("sourceBuffer 正在更新, 等待更新完成");
 
-          await awatingSourceBuffer()
+          await awatingSourceBuffer();
         }
 
-        const arrayBuffer = chunk.buffer
-
-        console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态')
-
+        const arrayBuffer = chunk.buffer;
+        console.assert(
+          !sourceBuffer?.updating,
+          "sourceBuffer 处于异常更新状态",
+        );
         sourceBuffer?.appendBuffer(arrayBuffer);
-        console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
-
+        console.log("写入sourceBuffer完成, 写入大小:", arrayBuffer.byteLength);
       },
       async close() {
-        console.log('音频数据已接收完毕');
-        loaded = true
         while (sourceBuffer?.updating) {
-          console.log('sourceBuffer 正在更新, 等待更新完成');
-          await awatingSourceBuffer()
+          console.log("sourceBuffer 正在更新, 等待更新完成");
+          await awatingSourceBuffer();
         }
-        console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
-        mediaSourceManager.endOfStream();
+        mediaSource.endOfStream();
+        loaded = true;
       },
       abort(reason) {
-        console.log('SourceBuffer WritableStream aborted:', reason);
-      }
-    })
-    res.body.pipeTo(writerStream)
-  })
+        mediaSource.endOfStream();
+        console.log("SourceBuffer WritableStream aborted:", reason);
+      },
+    });
+    res.body.pipeTo(writerStream);
+  });
 }
 ```
 
+可以看到, 通过readbleStream api持续读取音频数据, 并结合 WritableStream 对
+sourceBuffer 持续的添加字节数据, 完成从拉取数据并最终消费到缓冲区.
+缓冲区对象本身会将其内部的数据发送到 mediaSouce, 并最终给 audio 消费,
+实现音频播放
+
 ```mermaid
+---
+title: 通过 MSE API 消费异步数据流
+---
 graph TB
   Audio[new Audio]-.- audioObj -.-> out
   Audio==>s
@@ -193,7 +251,7 @@ graph TB
   s-.->|on sourceopen tigger|support
   URL==>|urlObj| out(("audioObj.src=urlObj"))
   subgraph 异步处理子程序
-    support{"是否支持mp3格式"} -- true --> createBuffer["创建缓冲对象"]
+    support{"是否支持mp3格式"} -- true --> createBuffer["mediaSouce.addSourceBuffer"]
     createBuffer-.->|souceBufferObj|pushBuffer
     createBuffer-->fetchStream[拉取媒体流]
     fetchStream-->|stream buffer data|pushBuffer[向缓冲对象添加音频数据]
@@ -204,54 +262,167 @@ graph TB
   stream@{ animate: true }
 ```
 
+## 三. 音频高阶处理
+
+此部分内容属于更高级些的内容, 服务目标是对音频的源做处理和可视化分析.
+对于是否将音频源在本地消费掉是可选的.
+
+### 流程概览
+
+AudioContext 设计上接受已有的 web 媒体 api 转化为其内部的媒体数据源节点. 同时,
+audioContext自身也可以创建音频振荡器作为音频原.
+
+```mermaid
+---
+title: audio context 数据流处理流程
+---
+graph LR
+  mediaElement([MediaElements])-.->source
+  mediaStream([MediaStreams])-.->source
+  subgraph AudioContext
+    source[Source nodes]==>effect[Effect Nodes]
+    effect==>destination((Destination))
+  end
+```
+
+根据本文的前文所描述的, Audio 属于 HTMLAudioElement 类型, 继承于
+HTMLMediaElement. 因此 Audio 就是 MediaElement 的子类.
+
+其通过[createMediaElementSource](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext)
+对象方法可以创建属于 audioContext 所需要的 SouceNode.
+
+将音频源(source node)节点连接下一个音频效果处理程序(effect node),
+这些节点算一个音频处理模块, 每个处理模块可以连接下一个音频处理模块,
+形成一个处理链(路由/图)
+
+经过音频处理模块后, 最终可以选择一个输出目的地,比如扬声器. 但不是必须的.
+
+以上, 通过这些api处理过程中, 可以对音频进行编程, 时间和效果都可以进行非常精确的控制.
+
+### 关键概念
+
+#### 1. AudioContext
+
+`AudioContext` 本质上是为音频处理工作流提供一个程序空间（上下文），用于声明音频源、音频处理（增益）顺序以及音频输出目的地的过程。
+因此，在开始处理任何音频前，应该创建一个 AudioContext。
+
+AudioContext 继承于 BaseAudioContext，所以很多 BaseAudioContext 的方法也能在 AudioContext 中使用，
+比如 `decodeAudioData` 方法，用于将原始的 ArrayBuffer 解码后返回音频数据（返回的也是 ArrayBuffer）。
+
+#### 2. AudioNode
+
+此概念为 AudioContext 上下文中的处理节点, 例如, audioNode 节点可以是一个音频源节点, 或者是一个音效处理节点,亦或是一个增幅节点, 还可能是是一个目的地节点
 
 
-## 更高级需求
+```mermaid
+---
+title: AudioContext 工作上下文工作流
+---
+
+flowchart LR
+
+  %% subgraph effectNode
+  %%   BiquadFilterNode[滤波器只有一个输入输出]-->ConvolverNode[混响]
+  %%   BiquadFilterNode-->DelayNode[延迟节点]
+  %%   BiquadFilterNode-->DynamicsCompressorNode[压缩混合]
+  %%   BiquadFilterNode-->GainNode[音量节点]
+  %%   BiquadFilterNode-->StereoPannerNode{声道处理}
+  %%   BiquadFilterNode-->WaveShaperNode{非线性处理}
+  %%   BiquadFilterNode-->PeriodicWave{塑性处理}
+
+  %% end
+  %% subgraph souceNode
+  %%  OscillatorNode-->PeriodicWave
+  %%  AudioBufferSourceNode-->BiquadFilterNode
+  %%  MediaElementAudioSourceNode-->BiquadFilterNode
+  %%  MediaStreamAudioSourceNode-->BiquadFilterNode
+  %% end
+   soucenode1-->effectnode1
+  subgraph effetchNodes
+    effectnode1 --> effectnode2
+  end
+
+  %% subgraph souceNode
+  %%  OscillatorNode-->effectnode1
+  %%  AudioBufferSourceNode-->effectnode1
+  %%  MediaElementAudioSourceNode-->effectnode1
+  %%  MediaStreamAudioSourceNode-->effectnode1
+  %% end
+ 
+
+ 
+ 
+
+  effectnode2-->destinationNode((destination))
 
 
 
-### AudioContext
+```
 
-AudioContext 本质上是为音频处理工作流提供一个程序空间（上下文），用于声明音频源、音频处理（增益）顺序以及音频播放的过程。因此，在开始处理任何音频前，应该创建一个 AudioContext。
+#### 3. 音频源节点
 
-AudioContext 继承于 BaseAudioContext，所以很多 BaseAudioContext 的方法也能在 AudioContext 中使用，比如 `decodeAudioData` 方法，用于将原始的 ArrayBuffer 解码后返回音频数据（返回的也是 ArrayBuffer）。本文不会涉及该方法的使用。
+所谓SouceNode, 是AudioNode的一个子大类, 本质上是AudioNode, 不同的是, 他是音频处理流程中的开始节点.
 
-本文也不会涉及 BaseAudioContext 的使用案例。
+**包含以下节点类型**
 
-### AudioNode
+- [OscillatorNode 振荡器](https://developer.mozilla.org/zh-CN/docs/Web/API/OscillatorNode)
+- [MediaElementAudioSourceNode 文档元素中的媒体源](https://developer.mozilla.org/zh-CN/docs/Web/API/MediaElementAudioSourceNode)
+- [MediaStreamAudioSourceNode 流媒体(WEB RTC)](https://developer.mozilla.org/zh-CN/docs/Web/API/MediaStreamAudioSourceNode)
+- [AudioBufferSourceNode 自定义音频源](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioBufferSourceNode)
 
-本文不会对音频增益（AudioNode）部分进行过多的案例展示与介绍。
+> [!NOTE]
+> `AudioBufferSourceNode` 通常由 `audioContext.decodeAudioData` 或 `audioContext.createBuffer` 方法产生的 [AudioBuffer](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioBuffer) 结合使用.
 
-### MediaSource
+**参考资料**
+- [音频源 - MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Audio_API#%E5%AE%9A%E4%B9%89%E9%9F%B3%E9%A2%91%E6%BA%90)
 
-播放方式有很多种，比如本文涉及到的 Audio 播放器对象，可以在创建实例时传入一个音频地址，实现对音频直接控制作用。
 
-本质上，通过初始化 Audio 传入播放地址的行为，与在 `<audio>` 标签加上 `src` 字符串属性没有太大区别。
+#### 4. 增幅/音效节点
 
-因此，当以上条件不满足，又不想基于其他插件获得流媒体功能时，就需要通过 [MSE API](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)，以纯 JavaScript 方式获得媒体串流。
+音效节点(处理模块)用于接受并处理来自于音频源节点的数据, 音效节点(处理模块)也可以接受其他的音效节点的处理输出作为音频源. 
 
-MediaSource 正是为了通过 JavaScript 创建媒体串流而设计的。
+**包含以下节点类型**
 
-### AudioDestinationNode
+- [BiquadFilterNode 滤波器](https://developer.mozilla.org/zh-CN/docs/Web/API/BiquadFilterNode)
+- [ConvolverNode 混响](https://developer.mozilla.org/zh-CN/docs/Web/API/ConvolverNode)
+- [DelayNode 延迟](https://developer.mozilla.org/en-US/docs/Web/API/DelayNode)
+- [DynamicsCompressorNode 混合压缩](https://developer.mozilla.org/zh-CN/docs/Web/API/DynamicsCompressorNode)
+- [GainNode 音量处理](https://developer.mozilla.org/zh-CN/docs/Web/API/GainNode)
+- [StereoPannerNode 立体声控制](https://developer.mozilla.org/en-US/docs/Web/API/StereoPannerNode)
+- [WaveShaperNode](https://developer.mozilla.org/zh-CN/docs/Web/API/WaveShaperNode)
+- [PeriodicWave 周期性塑性](https://developer.mozilla.org/zh-CN/docs/Web/API/PeriodicWave)
 
-该对象继承于 AudioNode，但着重于描述一个 AudioContext 音频处理的出口，即对音频进行最后播放（最后一个处理节点），播放后就是耳朵听到的声音，程序再无后续处理。
+
+#### 5. 消费/目的地节点
+
+该对象继承于 AudioNode，但着重于描述一个 AudioContext 音频处理的出口，即对音频进行最后怎么消费做定义/处理
+
+一共存在两个类型
+
+**[AudioDestinationNode](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioDestinationNode)**
+
 
 默认情况下，AudioContext 实例有一个 `destination` 属性，就是该对象。
 
+**[MediaStreamAudioDestinationNode](https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamAudioDestinationNode)**
 
-### 处理流程图
+用于 webRTC , 用于发出时的音效处理后的新的音频源
 
-### ReadableStream
+#### 6. 可视化
 
-本文演示案例是基于 fetch API 实现的获取 MP3 音频。
+**参考资料**
 
-fetch API 返回结果为 Response 对象，表示一个 HTTP 响应。当响应大且耗时时，甚至大到无法一次性存储完（近乎无限），就不能完全等待这个响应数据流。
+- [AnalyserNode](https://developer.mozilla.org/zh-CN/docs/Web/API/AnalyserNode)
 
-因此，Response 对象有一个 `body` 属性，用于处理获取的数据近乎无限的情况，将其视作涓涓流水（山泉/水龙头），源源不断流出，流出一部分就处理一部分。
+#### 7. 声道分离/合并
 
-这是实现一边播放一边获取音频的核心要点。
+**参考资料**
 
-## 实现
+
+- [ChannelSplitterNode](https://developer.mozilla.org/en-US/docs/Web/API/ChannelSplitterNode)
+- [ChannelMergerNode](https://developer.mozilla.org/zh-CN/docs/Web/API/ChannelMergerNode)
+
+## 四. AudioContext 简单案例
 
 特别说明：本文案例通过限制网络加载速度模拟一边播放一边加载的场景。音频文件本身不大，但将网络速度限制得很低，导致长时间无法加载完成，以此比喻网络加载慢的场景。
 
@@ -259,7 +430,7 @@ fetch API 返回结果为 Response 对象，表示一个 HTTP 响应。当响应
 
 ### 流媒体服务器
 
-主要代码文件结构如下：
+采用 [h3](https://h3.dev/) 作为服务器底层框架. 主要源码结构如下：
 
 ```
 .
@@ -284,205 +455,191 @@ app.mount("/mp3", mp3Response);
 serve(app, { port: 3000 });
 ```
 
-其中 `mp3.ts` 是返回 MP3 音频的全部代码，如下所示。需要注意的是，MP3 文件在服务端是按照 Stream 流式返回的。
+其中 `mp3.ts` 是返回 MP3 音频的全部代码，如下所示。需要注意的是，MP3
+文件在服务端是按照 Stream 流式返回的。
 
 ```typescript
-import { H3, defineHandler, getRouterParam } from "h3";
+import { defineHandler, getRouterParam, H3 } from "h3";
 
 const app = new H3();
 
-app.get("/:filePath", defineHandler(async (event) => {
-  const filepath = getRouterParam(event, "filePath") as string;
-  const path = [import.meta.dirname, filepath?.replace(/^\//, '')].join('/');
-  
-  try {
-    const file = await Deno.open(path, { read: true });
-    return new Response(file.readable, {
-      headers: {
-        "Content-Type": "audio/mpeg",
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    return Response.json({
-      message: 'only mp3 file a.mp3 and b.mp3 is supported',
-    }, {
-      status: 404,
-    });
-  }
-}));
+app.get(
+  "/:filePath",
+  defineHandler(async (event) => {
+    const filepath = getRouterParam(event, "filePath") as string;
+    const path = [import.meta.dirname, filepath?.replace(/^\//, "")].join("/");
+
+    try {
+      const file = await Deno.open(path, { read: true });
+      return new Response(file.readable, {
+        headers: {
+          "Content-Type": "audio/mpeg",
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      return Response.json({
+        message: "only mp3 file a.mp3 and b.mp3 is supported",
+      }, {
+        status: 404,
+      });
+    }
+  }),
+);
 
 export default app;
 ```
+### 客户端准备工作
 
-### AudioContext
+#### 1.  创建 AudioContext
 
-如前文概念所述，AudioContext 是处理音频的关键对象，音频处理的所有过程均在 AudioContext 程序空间中进行。因此首先应创建 AudioContext 对象：
+如前文概念所述，AudioContext 是处理音频的关键对象，音频处理的所有过程均在
+AudioContext 程序空间中进行。因此首先应创建 AudioContext 对象：
 
 ```typescript
 const audioContext = new AudioContext();
 ```
 
-### MediaSource
+#### 2. 准备MediaElement
+
+处于简单性考虑, 本文采用 MediaElement 的方式, 作为 AudioContext 的音频源(SouceNode)
 
 ```typescript
 const mediaSourceManager = new MediaSource();
+const audio = new Audio();
+audio.src = URL.createObjectURL(mediaSourceManager);
 ```
 
-### 建立处理逻辑
+#### 2. audioContext流程
 
 现在要指定 AudioContext 如何处理各个 AudioNode 的前后关系，代码如下：
 
 ```typescript
-const audio = new Audio();
-audio.src = URL.createObjectURL(mediaSourceManager);
-audio.autoplay = true;
-
 const audioSourceNode = audioContext.createMediaElementSource(audio);
 audioSourceNode.connect(audioContext.destination);
 ```
 
-此处建立的逻辑关系有点复杂：
+#### 小结
 
-使用 Audio API 主要是为了控制播放与音频播放行为。将 MediaSource 通过 `URL.createObjectURL` 赋值给 `src`，是因为很多浏览器不支持 `srcObject` 的赋值方式，作为回退才这么使用。
+本逻辑部分并未涉及到音频增幅/音效处理节点,而是获得数据流后直接向扬声器输出
 
-然后通过 `AudioContext.createMediaElementSource(audio)` 创建一个音频源 AudioNode，最后将该音频源 AudioNode 直接连接到播放器（即 AudioDestinationNode）。
+```mermaid
+---
+title: MediaElementAudioSourceNode准备工作
+---
+flowchart TB
 
-这样，通过 MediaElementAudioSourceNode 直接到 AudioDestinationNode 的音频处理关系就完成了，没有任何中间的音频增益处理节点，完成了最简单的 AudioContext 音频处理关系的建立。
+mediaSoucrce[new MediaSource]-->|mediaSource|urlObj[createObjectURL]
+audio[new Audio]-->|audio|link[audio.src=urlObj]
+urlObj-->|urlObj|link
 
-至此，基本程序准备完毕，但还没有为准备好的程序输入音频，也就是为 MediaSource 添加音频数据。
+link -->|audio|createNode
+subgraph AudioContext
+  createNode[createMediaElementSource]-->souceNode
+  souceNode-->destination[to destination]
+end
 
-### 创建音频数据流接收对象
+```
 
-现在 MediaSource 只能算一个媒体源管理对象，用于管理多个音频源。因此要添加音频源，必须通过管理对象指定。
+
+
+### 数据源填充
+
+
+#### 1. 准备缓冲对象
+现在 MediaSource
+只能算一个媒体源管理对象，用于管理多个音频源。因此要添加音频源，必须通过管理对象指定。
 
 特别要注意的是，在管理对象创建之前，必须等待该对象已经准备好才能创建源，否则程序将会报错。换句话说，必须等待管理器准备好接受数据源时才能创建源。
 
 ```typescript
 let sourceBuffer: SourceBuffer;
 
-mediaSourceManager.addEventListener('sourceopen', async () => {
-  console.log('sourceopen', mediaSourceManager.readyState);
-  if (sourceBuffer) return;
-  sourceBuffer = mediaSourceManager.addSourceBuffer('audio/mpeg');
+mediaSourceManager.addEventListener("sourceopen", async () => {
+  console.log('mediaSource 已准备好接收数据', mediaSource.readyState);
+  if (sourceBuffer) { return }
+
+
+  if (MediaSource.isTypeSupported('audio/mpeg')) {
+    sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg')
+  } else {
+    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
+  }
 });
 ```
 
-这样，就通过 `mediaSourceManager` 创建了一个音频接收对象，该对象可以通过 `appendBuffer` 方法添加（处理/消费）不断流入的音频数据流。
+这样，就通过 `mediaSourceManager` 创建了一个音频接收对象，该对象可以通过
+`appendBuffer` 方法添加（处理/消费）不断流入的音频数据流。
 
-### 获得数据流（建立管道）
+#### 2. 获得并写入缓冲
 
 ```typescript
 let loaded = false;
 
 function loadMp3(url?: string) {
   if (loaded) return;
-  
-  kyInstance(url ?? 'mp3/b.mp3').then(async res => {
+
+  fetch(url ?? "mp3/b.mp3").then(async (res) => {
     if (!res.body) return;
-    setupSourceBuffer(res.body);
-  });
-}
-```
-
-### 写入音频数据
-
-```typescript
-async function awatingSourceBuffer() {
-  const { resolve, promise } = Promise.withResolvers<void>();
-  sourceBuffer.addEventListener('updateend', () => resolve(), { once: true });
-  return promise;
-}
-
-function setupSourceBuffer(readableStream: ReadableStream) {
-  const writerStream = new WritableStream({
-    start(controller) {
-      console.log('开始接受媒体流数据');
-    },
     
-    async write(chunk, controller) {
-      const { resolve, reject, promise } = Promise.withResolvers<void>();
-      
-      while (sourceBuffer.updating) {
-        console.log('sourceBuffer 正在更新，等待更新完成');
-        await awatingSourceBuffer();
-      }
+      const writerStream = new WritableStream({
 
-      const arrayBuffer = chunk.buffer.slice(
-        chunk.byteOffset,
-        chunk.byteOffset + chunk.byteLength
-      );
+        start(controller) {
+          console.log('开始接受媒体流数据');
+        },
+        async write(chunk, controller) {
+          while (sourceBuffer?.updating) {
+            // 等待更新状态稳定
+            console.log('sourceBuffer 正在更新, 等待更新完成');
 
-      try {
-        if (sourceBuffer.updating) {
-          return reject(new Error('致命错误：sourceBuffer 处于异常更新状态'));
+            await awatingSourceBuffer()
+          }
+
+          const arrayBuffer = chunk.buffer
+          console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态')
+
+          sourceBuffer?.appendBuffer(arrayBuffer);
+          console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
+
+
+        },
+        async close() {
+          console.log('音频数据已接收完毕');
+          while (sourceBuffer?.updating) {
+            console.log('sourceBuffer 正在更新, 等待更新完成');
+            await awatingSourceBuffer()
+          }
+          console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
+          mediaSource.endOfStream();
+          loaded = true
+        },
+        abort(reason) {
+          console.log('SourceBuffer WritableStream aborted:', reason);
         }
-        sourceBuffer.appendBuffer(arrayBuffer);
-        console.log('写入 sourceBuffer 完成，写入大小:', arrayBuffer.byteLength);
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-      return promise;
-    },
-    
-    async close() {
-      console.log('音频数据已接收完毕');
-      loaded = true;
-      
-      while (sourceBuffer.updating) {
-        console.log('sourceBuffer 正在更新，等待更新完成');
-        await awatingSourceBuffer();
-      }
-      
-      console.log('结束数据流，将数据流写入 sourceBuffer 完成，开始 endOfStream');
-      mediaSourceManager.endOfStream();
-    },
-    
-    abort(reason) {
-      console.log('SourceBuffer WritableStream aborted:', reason);
-    }
+      })
+      res.body.pipeTo(writerStream)
+
   });
-  
-  readableStream.pipeTo(writerStream);
 }
 ```
 
-## 完整案例
+
+## 五. 客户端逻辑源码
+
+### **typescript部分**
+
 
 ```typescript
-// readble.client.ts
-import ky from "ky";
+// audiocontext.client.ts
+import mime from 'mime'
 
 const audioContext = new AudioContext();
-export let mediaSourceManager = new MediaSource()
+export let mediaSource = new MediaSource()
 
 
 
-function bindAudioEvent(audio: HTMLAudioElement) {
-  audio.addEventListener('ended', (e) => {
-    console.log('audio ended event', e)
-  })
-
-  audio.addEventListener('pause', (e) => {
-    console.log('pause event', e)
-  })
-
-  audio.addEventListener('play', (e) => {
-    console.log('play event', e)
-  })
-
-  audio.addEventListener('timeupdate', (e) => {
-    console.log('timeupdate event')
-
-  })
-}
-
-
-export let audio = new Audio()
-bindAudioEvent(audio)
-audio.src = URL.createObjectURL(mediaSourceManager)
-audio.autoplay = true
+export const audio = new Audio()
+audio.src = URL.createObjectURL(mediaSource)
 
 
 
@@ -490,153 +647,196 @@ const audioSouceNode = audioContext.createMediaElementSource(audio)
 
 audioSouceNode.connect(audioContext.destination)
 
-export let sourceBuffer: SourceBuffer
+export let sourceBuffer: SourceBuffer | undefined
 
 
-mediaSourceManager.addEventListener('sourceopen', async () => {
-  console.log('mediaSourceManager 已准备好接收数据', mediaSourceManager.readyState);
+mediaSource.addEventListener('sourceopen', async () => {
+  console.log('mediaSource 已准备好接收数据', mediaSource.readyState);
   if (sourceBuffer) { return }
-  sourceBuffer = mediaSourceManager.addSourceBuffer('audio/mpeg')
 
+  const mp3format = mime.getType('.mp3')!
+
+  if (MediaSource.isTypeSupported(mp3format)) {
+    sourceBuffer = mediaSource.addSourceBuffer(mp3format)
+  } else {
+    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
+  }
 })
 
-mediaSourceManager.addEventListener('sourceended', () => {
+mediaSource.addEventListener('sourceended', () => {
   console.log('媒体流已结束')
 })
 
-mediaSourceManager.addEventListener('sourceclose', () => {
+mediaSource.addEventListener('sourceclose', () => {
   console.log('媒体流已关闭')
 })
 
-const kyInstance = ky.create({
-  prefixUrl: '/api',
-})
+
 async function awatingSourceBuffer() {
   const { resolve, promise } = Promise.withResolvers<void>()
-  sourceBuffer.addEventListener('updateend', () => resolve(), { once: true })
+  sourceBuffer?.addEventListener('updateend', () => resolve(), { once: true })
   return promise
 }
 let loaded = false
-function setupSourceBuffer(readableStream: ReadableStream) {
-  const writerStream = new WritableStream({
 
-    start(controller) {
-      console.log('开始接受媒体流数据');
-    },
-    async write(chunk, controller) {
-      const { resolve, reject, promise } = Promise.withResolvers<void>()
-      while (sourceBuffer.updating) {
-        // 等待更新状态稳定
-        console.log('sourceBuffer 正在更新, 等待更新完成');
-
-        await awatingSourceBuffer()
-      }
-
-      const arrayBuffer = chunk.buffer.slice(
-        chunk.byteOffset,
-        chunk.byteOffset + chunk.byteLength
-      );
-
-      try {
-        if (sourceBuffer.updating) {
-          return reject(new Error('致命错误:sourceBuffer 处于异常更新状态'))
-        }
-        sourceBuffer.appendBuffer(arrayBuffer);
-        console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
-        resolve()
-
-      } catch (error) {
-        reject(error)
-      }
-      return promise
-    },
-    async close() {
-      console.log('音频数据已接收完毕');
-      loaded = true
-      while (sourceBuffer.updating) {
-        console.log('sourceBuffer 正在更新, 等待更新完成');
-        await awatingSourceBuffer()
-      }
-      console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
-      mediaSourceManager.endOfStream();
-    },
-    abort(reason) {
-      console.log('SourceBuffer WritableStream aborted:', reason);
-    }
-  })
-  readableStream.pipeTo(writerStream)
-}
 export function loadMp3(url?: string) {
   if (loaded) {
     return
   }
-  kyInstance(url ?? 'mp3/b.mp3').then(async res => {
-    if (!res.body) {
-      return
-    }
-    setupSourceBuffer(res.body)
-  })
+  fetch(url ?? '/assets/a.mp3',)
+    .then(async res => {
+      if (!res.body) {
+        return
+      }
+
+      const writerStream = new WritableStream({
+
+        start(controller) {
+          console.log('开始接受媒体流数据');
+        },
+        async write(chunk, controller) {
+          while (sourceBuffer?.updating) {
+            // 等待更新状态稳定
+            console.log('sourceBuffer 正在更新, 等待更新完成');
+
+            await awatingSourceBuffer()
+          }
+
+          const arrayBuffer = chunk.buffer
+          console.assert(!sourceBuffer?.updating, 'sourceBuffer 处于异常更新状态')
+
+          sourceBuffer?.appendBuffer(arrayBuffer);
+          console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
+
+
+        },
+        async close() {
+          console.log('音频数据已接收完毕');
+          while (sourceBuffer?.updating) {
+            console.log('sourceBuffer 正在更新, 等待更新完成');
+            await awatingSourceBuffer()
+          }
+          console.log('结束数据流 , 将数据流写入sourceBuffer完成,开始endOfStream');
+          mediaSource.endOfStream();
+          loaded = true
+        },
+        abort(reason) {
+          console.log('SourceBuffer WritableStream aborted:', reason);
+        }
+      })
+      res.body.pipeTo(writerStream)
+
+    })
 }
 export function play() {
   console.log(audioContext.state);
-  if (audioContext.state === 'suspended') {
-    audioContext.resume().then(() => {
-      console.log('audioContext resumed');
+  switch (audioContext.state) {
+    case 'suspended':
+      audioContext.resume().then(() => {
+        audio.play()
+      })
+      break
+    case 'running':
       audio.play()
-    })
-  } else {
-    audio.play()
   }
 
 }
 
 export function pause() {
-  audio.pause()
   audioContext.suspend()
+    .then(() => {
+      audio.pause()
+    })
 }
 
-
 ```
+
+### **ui部分**
 
 ```tsx
 // index.tsx
 import { Button } from "~/components/ui/button";
-import { play, pause, audio, loadMp3 } from "./readble.client";
-import { useRef, useState } from "react";
-import { useEventListener, useMount } from "@reactuses/core";
-
+import { audio, loadMp3 } from "./mse.client";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEventListener, } from "usehooks-ts";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion'
+import { HardDriveDownload, Loader2, Pause, Play, RotateCcw } from "lucide-react";
 export default function Readble() {
-  const audioRef = useRef<HTMLAudioElement>(null)
+  /**
+   * media source extension api
+   */
+  const audioRefInstance = useRef(audio)
+  const [loading, setLoading] = useState(false)
+  /**
+   * 是否已经准备好播放第一帧数据
+   */
   const [loaded, setLoaded] = useState(false)
-  /* useMount(()=>{
+  const [loadedCount, setLoadedCount] = useState(0)
+  const startLoading = useCallback(() => {
+    setLoading(true)
     loadMp3()
-  }) */
+  }, [])
+  useEffect(() => {
+    setLoadedCount(audio.currentTime)
+    setLoaded(audio.readyState === 4 && audio.buffered.length > 0)
+  }, [])
+  useEventListener('timeupdate', (e) => {
+    setLoadedCount(audio.currentTime)
+  }, audioRefInstance)
+  /**
+   * 是否已经暂停
+   */
+  const [paused, setPaused] = useState(true)
+  useEffect(() => {
+    setPaused(audio.paused)
+  }, [])
+
   useEventListener('loadeddata', (e) => {
     setLoaded(true)
-  }, audio)
-  return <div>
-    <audio ref={audioRef} controls>
-      <source src="/api/mp3/b.mp3" type="audio/mpeg" />
-    </audio>
+    setLoading(false)
+    audioRefInstance.current.play()
+  }, audioRefInstance)
+  useEventListener('play', (e) => {
+    setPaused(false)
+  }, audioRefInstance)
+  useEventListener('pause', (e) => {
+    setPaused(true)
+  }, audioRefInstance)
 
-    <Button onClick={() => {
-      audioRef.current?.play()
-    }}>
-      播放
-    </Button>
-    <hr />
-    <div>media extends api 音频</div>
-    <Button onClick={() => {
-      loadMp3()
-    }}>
-      加载
-    </Button>
-    <Button disabled={!loaded} onClick={() => play()}>
-      播放
-    </Button>
-    <Button onClick={() => audio?.pause()}>
+
+  const useControlAudio = useMemo(() => {
+    if (!loaded) {
+      return null
+    }
+
+
+    if (paused) {
+      return <Button onClick={() => audioRefInstance.current.play()}>
+        <Play />
+        播放
+      </Button>
+    }
+
+    return <Button onClick={() => audioRefInstance.current.pause()}>
+      <Pause />
       暂停
     </Button>
+
+
+
+
+  }, [loaded, paused])
+  return <div>
+    {!loaded && <Button disabled={loading} onClick={startLoading}>
+      {loading ? <Loader2 className="size-4 animate-spin" /> : <HardDriveDownload />}
+      加载并播放
+    </Button>}
+    {
+      useControlAudio
+    }
+    {loaded && <Button className="select-none" disabled={!loadedCount} onClick={() => audioRefInstance.current.currentTime = 0}>
+      <RotateCcw />重新播放
+    </Button>}
   </div>
 }
 ```
