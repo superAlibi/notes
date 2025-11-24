@@ -12,10 +12,12 @@ outline: [2,4]
 
 想要流畅阅读本文，需要读者具备以下知识储备：
 
-- 熟悉 [Streams API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
+- 熟悉 [Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API)
 - 熟悉 [Fetch API](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch)
+- 熟悉对象继承概念
+- 工程化前端项目经验
+- 了解 HTTP 协议及 HTTP 服务器
 - 了解 [ECMAScript 2024](https://tc39.es/ecma262/2024/)
-- 了解对象继承概念
 - 了解 [Media Source Extensions API](https://developer.mozilla.org/zh-CN/docs/Web/API/Media_Source_Extensions_API)
 
 **参考链接**
@@ -28,11 +30,11 @@ outline: [2,4]
 
 ## 前言
 
-工作中遇到了类似功能逻辑，初次看到时，就觉得其代码不够优雅，主要体现在没有充分运用 Stream 数据流背压技术。
+工作中遇到了类似功能逻辑，初次看到时，就觉得其代码不够优雅，主要体现在没有充分运用 Stream API 流背压技术。
 
-除此之外，我对 [Web 媒体技术](https://developer.mozilla.org/zh-CN/docs/Web/Media) 本身也具有很高的学习热情。因为现代媒体技术已不同于以往使用 Flash 技术的时代，现在相关工作组已经将技术规范标准化。
+除此之外，我对 [Web 媒体技术](https://developer.mozilla.org/zh-CN/docs/Web/Media) 本身也具有很高的学习热情。因为现代媒体技术已不同于以往使用 Flash 技术的时代，现在相关工作组已经其规范标准化。
 
-国内由于各种原因并未采用相关标准实现在线直播或语音聊天，这让我感觉很失落。最近两天花了点时间学习了相关概念，虽然仅限皮毛且仅限于音频技术，但已足以应付工作中的相关问题，更重要的是通过写作记录加深印象。
+国内由于各种原因并未采用相关标准实现在线直播或语音聊天，这让我感觉些许失望。最近两天花了点时间学习了相关概念，虽然仅限皮毛且仅限于音频技术，但已足以应付工作中的相关问题，更重要的是通过写作记录加深印象。
 
 Web 媒体技术涉及诸多概念，本文主旨在于介绍以下场景：
 
@@ -113,9 +115,36 @@ audio.src = URL.createObjectURL(mediaSource);
 在为源头添加数据前，需要等待 `MediaSource` 准备完毕才行。通过 MediaSource 触发的 `sourceopen` 事件，便能知晓 MediaSource 已经准备完毕。
 
 ```typescript
+
+mediaSource.addEventListener("sourceopen", async () => {
+  console.log(
+    "mediaSourceManager 已准备好接收数据",
+    mediaSource.readyState,
+  );
+  if (sourceBuffer) return;
+
+  if (MediaSource.isTypeSupported("audio/mpeg")) {
+    // 在这里为 MediaSource 声明缓冲区
+  } else {
+    throw new Error(
+      "浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。",
+    );
+  }
+});
+```
+
+此处引入了一个新的概念，称为缓冲区 (`SourceBuffer`)。一个 MediaSource 是可以添加多个缓冲区的，相当于可以存在数个数据流缓冲。
+
+根本上，通过异步数据返回的流，是添加在缓冲区对象中的。通过缓冲对象与 MediaSource 建立传输连接，实现数据流到 audio 的播放。
+
+接下来，通过 UI 交互触发流的拉取, 再到流写入 SourceBuffer , 最后实现数据流到audio的播放。
+
+
+#### 3. 创建缓冲区
+
+```typescript{2,11}
 // 音频流缓冲对象
 let sourceBuffer: SourceBuffer | undefined;
-
 mediaSource.addEventListener("sourceopen", async () => {
   console.log(
     "mediaSourceManager 已准备好接收数据",
@@ -133,14 +162,7 @@ mediaSource.addEventListener("sourceopen", async () => {
   }
 });
 ```
-
-此处引入了一个新的概念，称为 SourceBuffer。一个 MediaSource 是可以添加多个缓冲区的，相当于可以存在数个缓冲。
-
-根本上，通过异步数据返回的流，是添加在缓冲区对象中的。通过缓冲对象与 MediaSource，实现数据流传输到 audio 中进行播放。
-
-接下来，通过 UI 操作实现对 SourceBuffer 添加音频数据流。
-
-#### 3. 拉取并填充数据
+#### 4. 拉取并填充数据
 
 以下代码由 React 编写的 UI，具体语法此处不介绍。主要描述了加载按钮、播放操作和暂停播放。具体函数内容将在后文介绍，此处作为上下文补充内容。
 
@@ -215,6 +237,9 @@ function loadMp3(url?: string) {
 }
 ```
 
+
+#### 小结
+
 可以看到，通过 ReadableStream API 持续读取音频数据，并结合 WritableStream 对 sourceBuffer 持续添加字节数据，完成从拉取数据并最终消费到缓冲区。缓冲区对象本身会将其内部的数据发送到 MediaSource，并最终给 audio 消费，实现音频播放。
 
 ```mermaid
@@ -228,10 +253,10 @@ graph TB
   s-.->|on sourceopen trigger|support
   URL==>|urlObj| out(("audioObj.src=urlObj"))
   subgraph 异步处理子程序
-    support{"是否支持 MP3 格式"} -- true --> createBuffer["mediaSource.addSourceBuffer"]
-    createBuffer-.->|sourceBufferObj|pushBuffer
-    createBuffer-->fetchStream[拉取媒体流]
-    fetchStream-->|stream buffer data|pushBuffer[向缓冲对象添加音频数据]
+    support{"是否支持 MP3 格式"} -- true --> createBuffer["addSourceBuffer"]
+    createBuffer-.->|bufferObj|pushBuffer
+    createBuffer-->fetchStream["fetch('file.mp3')"]
+    fetchStream-->|data block|pushBuffer["bufferObj.appendBuffer"]
     support -- false --> Error["throw Error()"]
   end
   pushBuffer stream@==>|media stream|s
@@ -244,24 +269,27 @@ graph TB
 
 ### 流程概览
 
-AudioContext 设计上接受已有的 Web 媒体 API 转化为其内部的媒体数据源节点。同时，AudioContext 自身也可以创建音频振荡器作为音频源。
+AudioContext 设计上兼容已有的 Web 媒体 API 。 通过 [createMediaElementSource](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaStreamSource)  将 MediaElement 转化为 AudioContext 数据源节点(SourceNode). 对于 `MediaStream` 则通过  [createMediaStreamSource](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaStreamSource)  创建数据源节点(SourceNode)。同时，AudioContext 自身也可以创建音频振荡器作为音频源。甚至, 你还可以通过直接创建缓冲数据区添加数据, 而不是通过已有的数据源.
 
 ```mermaid
 ---
 title: AudioContext 数据流处理流程
 ---
 graph LR
-  mediaElement([MediaElements])-.->source
-  mediaStream([MediaStreams])-.->source
+
+  mediaElement([MediaElements])-.->createMediaElementSource
+  mediaStream([MediaStreams])-.->createMediaStreamSource
   subgraph AudioContext
+    createMediaElementSource[createMediaElementSource]-->source
+    createMediaStreamSource[createMediaStreamSource]-->source
+    createOscillator-->source
+    createBufferSource-->source
     source[Source nodes]==>effect[Effect Nodes]
-    effect==>destination((Destination))
+    effect-.->destination((Destination))
   end
 ```
 
 根据本文的前文所描述的，Audio 属于 HTMLAudioElement 类型，继承于 HTMLMediaElement。因此 Audio 就是 MediaElement 的子类。
-
-其通过 [createMediaElementSource](https://developer.mozilla.org/zh-CN/docs/Web/API/AudioContext/createMediaElementSource) 对象方法可以创建属于 AudioContext 所需要的 SourceNode。
 
 将音频源（Source Node）节点连接下一个音频效果处理程序（Effect Node），这些节点算一个音频处理模块，每个处理模块可以连接下一个音频处理模块，形成一个处理链（路由/图）。
 
@@ -286,11 +314,9 @@ AudioContext 继承于 BaseAudioContext，所以很多 BaseAudioContext 的方�
 title: AudioContext 工作上下文工作流
 ---
 flowchart LR
-  sourceNode1-->effectNode1
-  subgraph effectNodes
-    effectNode1 --> effectNode2
-  end
-  effectNode2-->destinationNode((destination))
+
+  sourceNode([SourceNode])-->EffectNode--> destinationNode((destination))
+
 ```
 
 #### 3. 音频源节点
@@ -326,9 +352,9 @@ flowchart LR
 - [WaveShaperNode](https://developer.mozilla.org/zh-CN/docs/Web/API/WaveShaperNode)
 - [PeriodicWave 周期性塑性](https://developer.mozilla.org/zh-CN/docs/Web/API/PeriodicWave)
 
-#### 5. 消费/目的地节点
+#### 5. 终点节点
 
-该对象继承于 AudioNode，但着重于描述一个 AudioContext 音频处理的出口，即对音频进行最后怎么消费做定义/处理。
+该对象继承于 AudioNode，但着重于描述一个 AudioContext 音频处理的出口，即对音频进行最后处理。
 
 一共存在两个类型：
 
@@ -338,7 +364,7 @@ flowchart LR
 
 **[MediaStreamAudioDestinationNode](https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamAudioDestinationNode)**
 
-用于 WebRTC，用于发出时的音效处理后的新的音频源。
+用于 WebRTC，用于将处理后的音效作为新的 MediaStream。
 
 #### 6. 可视化
 
@@ -355,9 +381,11 @@ flowchart LR
 
 ## 四、AudioContext 简单案例
 
-特别说明：本文案例通过限制网络加载速度模拟一边播放一边加载的场景。音频文件本身不大，但将网络速度限制得很低，导致长时间无法加载完成，以此比喻网络加载慢的场景。
+> [!TIP]
+> 案例通过限制网络加载速度模拟一边播放一边加载的场景。
+> 音频文件本身不大，但通过将网络速度限制到非常低方式，类比低速网络场景。
 
-此时就需要一边加载一边播放，以保证用户端获得良好的使用体验。
+案例目标为实现一边加载一边播放，以保证用户端获得更好的加载体验。
 
 ### 流媒体服务器
 
@@ -420,7 +448,7 @@ app.get(
 export default app;
 ```
 
-### 客户端准备工作
+### 前置准备
 
 #### 1. 创建 AudioContext
 
@@ -435,19 +463,21 @@ const audioContext = new AudioContext();
 出于简单性考虑，本文采用 MediaElement 的方式，作为 AudioContext 的音频源（SourceNode）。
 
 ```typescript
-const mediaSourceManager = new MediaSource();
+const mediaSource = new MediaSource()
 const audio = new Audio();
-audio.src = URL.createObjectURL(mediaSourceManager);
+audio.src = URL.createObjectURL(mediaSource)
 ```
 
-#### 3. AudioContext 流程
+#### 3. 工作流定义
 
 现在要指定 AudioContext 如何处理各个 AudioNode 的前后关系，代码如下：
 
 ```typescript
-const audioSourceNode = audioContext.createMediaElementSource(audio);
-audioSourceNode.connect(audioContext.destination);
+const audioSouceNode = audioContext.createMediaElementSource(audio)
+audioSouceNode.connect(audioContext.destination)
 ```
+
+此定义表示从数据源节点直接通向了扬声器, 没有经过音效处理模块(EffectAudioNode)
 
 #### 小结
 
@@ -455,16 +485,16 @@ audioSourceNode.connect(audioContext.destination);
 
 ```mermaid
 ---
-title: MediaElementAudioSourceNode 准备工作
+title: 音频处理准备与流程定义
 ---
 flowchart TB
   mediaSource[new MediaSource]-->|mediaSource|urlObj[createObjectURL]
   audio[new Audio]-->|audio|link[audio.src=urlObj]
   urlObj-->|urlObj|link
-  link -->|audio|createNode
+  link -->|"audio(MediaElement)"|createNode
   subgraph AudioContext
     createNode[createMediaElementSource]-->sourceNode
-    sourceNode-->destination[to destination]
+    sourceNode-->destination((to destination))
   end
 ```
 
@@ -472,28 +502,29 @@ flowchart TB
 
 #### 1. 准备缓冲对象
 
-现在 MediaSource 只能算一个媒体源管理对象，用于管理多个音频源。因此要添加音频源，必须通过管理对象指定。
+现在 mediaSource 充当媒体源管理对象，用于管理多个音频源。因此要添加音频源，须通过管理对象指定。
 
-特别要注意的是，在管理对象创建之前，必须等待该对象已经准备好才能创建源，否则程序将会报错。换句话说，必须等待管理器准备好接受数据源时才能创建源。
+> [!NOTE]
+> 在通过管理对象创建缓冲区之前，必须等待该管理器对象准备好 (通过 `sourceopen` 事件)，否则程序将会报错。
 
 ```typescript
-let sourceBuffer: SourceBuffer;
+let sourceBuffer: SourceBuffer | undefined
 
-mediaSourceManager.addEventListener("sourceopen", async () => {
+mediaSource.addEventListener('sourceopen', async () => {
   console.log('mediaSource 已准备好接收数据', mediaSource.readyState);
-  if (sourceBuffer) { return; }
+  if (sourceBuffer) { return }
 
   if (MediaSource.isTypeSupported('audio/mpeg')) {
-    sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+    sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg')
   } else {
-    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。');
+    throw new Error('浏览器不支持任何 MSE 音频格式。请使用 MP4 容器格式的音频文件（AAC 或 MP3 in MP4）。')
   }
-});
+})
 ```
 
-这样，就通过 `mediaSourceManager` 创建了一个音频接收对象，该对象可以通过 `appendBuffer` 方法添加（处理/消费）不断流入的音频数据流。
+这样，就通过 `mediaSource` 创建了一个音频接收对象，该对象可以通过 `appendBuffer` 方法添加（处理/消费）不断流入的音频数据流。
 
-#### 2. 获得并写入缓冲
+#### 2. 音频拉取并写入缓冲
 
 ```typescript
 let loaded = false;
@@ -539,6 +570,8 @@ function loadMp3(url?: string) {
 }
 ```
 
+拉取流部分, 采用了 [ECMAScript Stream API](https://developer.mozilla.org/zh-CN/docs/Web/API/Streams_API), 以获得流的背压能力
+
 ## 五、客户端逻辑源码
 
 ### **TypeScript 部分**
@@ -550,20 +583,13 @@ import mime from 'mime'
 const audioContext = new AudioContext();
 export let mediaSource = new MediaSource()
 
-
-
 export const audio = new Audio()
 audio.src = URL.createObjectURL(mediaSource)
 
-
-
 const audioSouceNode = audioContext.createMediaElementSource(audio)
-
 audioSouceNode.connect(audioContext.destination)
 
 export let sourceBuffer: SourceBuffer | undefined
-
-
 mediaSource.addEventListener('sourceopen', async () => {
   console.log('mediaSource 已准备好接收数据', mediaSource.readyState);
   if (sourceBuffer) { return }
@@ -622,7 +648,6 @@ export function loadMp3(url?: string) {
           sourceBuffer?.appendBuffer(arrayBuffer);
           console.log('写入sourceBuffer完成, 写入大小:', arrayBuffer.byteLength);
 
-
         },
         async close() {
           console.log('音频数据已接收完毕');
@@ -665,7 +690,6 @@ export function playOrResume() {
       break
   }
 }
-
 ```
 
 ### **UI 部分**
