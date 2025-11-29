@@ -65,12 +65,12 @@ features:
 
 - [关于dnf](/blogs/about-dnf)
 - [关于文件系统树标准](/blogs/about-fs)
-- [关于print css](/blogs/about-print-css)
+- [关于print css](/blogs/print-css/index)
 - [TCP/IP 详解 - 卷一：协议](/blogs/comput-tcpip-protocols/index)
 - [前端monorepo仓库](/blogs/monorepo)
 - [MSE API 与 音频播放](/blogs/web_media/audio_api)
 - [Podman + Docker Registry + NPM 配置指南](/blogs/docker-registry)
 - sso 与 oauth
-- 渐进式 Web 应用(PWA)
+- web可访问性与渐进式体验概述
 - 低代码/无代码浅谈
 - 个人聊天助手的设计(基于dify)
