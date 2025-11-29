@@ -61,7 +61,7 @@ features:
       src: /blogs/gitea/gitea.svg
     title: gitea 二三事
     details: 轻量化的 gite 仓库, 可以利用github的action生态. 文中介绍了部署私有化仓库到 ci/cd 的整个流程
-    link: /blogs/about-gitea
+    link: /blogs/gitea
   
 ---
 
