@@ -30,13 +30,23 @@ outline: [2,3]
 
 原称 `page-break-before`, 现在更推荐用 `break-before`
 
+属性用于某个选择器之前插入换页样式
+分页策略详见 [mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/break-before) 
+
+
 ### break-after
 
 原称 `page-break-after`, 现在更推荐用 `break-after`
 
+属性用于某个选择器之前插入换页样式
+分页策略详见 [mdn](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/break-after) 
+
 ### break-inside
 
 原称 `page-break-inside`, 现在更推荐用 `break-inside`
+
+用于在某个元素内部插入分页
+分页策略详见 [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/break-inside)
 
 ### orphans
 
@@ -99,9 +109,7 @@ page 规则用于定义某一种打印样式规则集. 然后通过规则指定�
   }
 }
 ```
-<!-- @include: ./htmls/atrule.md -->
-
-<!-- <<< ./htmls/atrule.md -->
+[查看案例](https://remix.lucardo.website/blogs/print-css)
 
 ### 专属属性
 
@@ -115,23 +123,31 @@ page 规则用于定义某一种打印样式规则集. 然后通过规则指定�
 
 据[mdn](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Reference/At-rules/@page#%E8%BE%B9%E8%B7%9D_at_%E8%A7%84%E5%88%99)介绍, 有关@page内部专属的@规则,到 2023年8月为止, 还没有任何浏览器实现相关标准
 
-- @top-left-corner
-- @top-left
-- @top-center
-- @top-right
-- @top-right-corner
-- @bottom-left-corner
-- @bottom-left
-- @bottom-center
-- @bottom-right
-- @bottom-right-corner
-- @left-top
-- @left-middle
-- @left-bottom
-- @right-top
-- @right-middle
-- @right-bottom
-- @left-top
-- @left-bottom
+这些规则使用规则可以参考伪元素使用方法.
+
+1. @top-left-corner
+2. @top-left
+3. @top-center
+4. @top-right
+5. @top-right-corner
+6. @bottom-left-corner
+7. @bottom-left
+8. @bottom-center
+9. @bottom-right
+10. @bottom-right-corner
+11. @left-top
+12. @left-middle
+13. @left-bottom
+14. @right-top
+15. @right-middle
+16. @right-bottom
+
+实际上, 以上的所有节点中, 所描述的区域可以用下图解释
+
+![规则位置图](/blogs/css/css_page_margin_boxes_top-left-corner.png)
 
 ## 通用css属性
+
+**参考连接**
+
+- [通用页面属性 - MDN](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Reference/At-rules/@page)
