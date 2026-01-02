@@ -75,7 +75,7 @@ features:
 - [前端monorepo仓库](/blogs/monorepo)
 - [Podman + Docker Registry + NPM 配置指南](/blogs/docker-registry)
 - sso 与 oauth
-- web可访问性与渐进式体验概述
+- [firewalld](/blogs/firewalld/index)
 - 低代码/无代码浅谈
 - 个人聊天助手的设计(基于dify)
 - web可访问性与渐进式体验概述
