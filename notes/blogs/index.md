@@ -19,6 +19,11 @@ features:
     details: 想象一下一个厚厚的文档没有一点图例, 那本书该有多无聊呢? 一图胜千言
     link: /blogs/mermaid/index
   - icon: 
+      src: /blogs/firewalld/生成网络防火墙图标.png
+    title: firewalld
+    details: 对第四代防火墙的浅浅理解
+    link: /blogs/firewalld/index
+  - icon: 
       src: /blogs/mse/icon.png
     title: MSE API 与 音频播放
     details: 媒体流处理与 mse 使用方法 及其简单案例
