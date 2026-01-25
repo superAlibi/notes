@@ -109,7 +109,7 @@ page 规则用于定义某一种打印样式规则集. 然后通过规则指定�
   }
 }
 ```
-[查看案例](https://remix.lucardo.website/blogs/print-css)
+[查看案例](https://remix.luchador.dev/blogs/print-css)
 
 ### 专属属性
 
