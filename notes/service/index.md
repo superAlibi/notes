@@ -17,10 +17,10 @@ features:
     link: https://gitea.lucardo.website:4443
     details: 仅 ipv6 访问的代码仓库(已关闭)
   - title: 博客案例
-    link: https://remix.lucardo.website
+    link: https://remix.luchador.dev
     details: 博客中的实际案例. 使用 react-router 7x (SSR). 并部署在边缘计算云中
   - title: deno fresh 实例
-    link: https://fresh.lucardo.website
+    link: https://fresh.luchador.dev
     details: 基于脚手架 deno + preact 的 ssr 框架, 使用 deno deploy 部署. 
 
 ---
