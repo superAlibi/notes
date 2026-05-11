@@ -35,7 +35,7 @@ export default defineConfig({
   vite: {
     server: {
       host: true,
-      allowedHosts: ['wj14x.lucardo.xyz']
+      allowedHosts: ['notes.luchador.dev']
     },
   },
   head: [
